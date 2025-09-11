@@ -25,19 +25,27 @@
                         <div class="text-sm font-medium text-gray-500">Estado</div>
                         <div class="mt-1">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($publicData['status'] === 'lead') bg-gray-100 text-gray-800
-                                @elseif($publicData['status'] === 'ready') bg-blue-100 text-blue-800
-                                @elseif($publicData['status'] === 'delivered') bg-green-100 text-green-800
+                                @if($publicData['status'] === 'por_recepcionar') bg-gray-100 text-gray-800
+                                @elseif($publicData['status'] === 'recepcionado') bg-blue-100 text-blue-800
+                                @elseif($publicData['status'] === 'dejado_almacen') bg-yellow-100 text-yellow-800
+                                @elseif($publicData['status'] === 'en_nicaragua') bg-purple-100 text-purple-800
+                                @elseif($publicData['status'] === 'entregado') bg-green-100 text-green-800
                                 @else bg-red-100 text-red-800
                                 @endif">
                                 @switch($publicData['status'])
-                                    @case('lead')
-                                        En Proceso
+                                    @case('por_recepcionar')
+                                        Por Recepcionar
                                         @break
-                                    @case('ready')
-                                        Listo para Envío
+                                    @case('recepcionado')
+                                        Recepcionado
                                         @break
-                                    @case('delivered')
+                                    @case('dejado_almacen')
+                                        Dejado en Almacén
+                                        @break
+                                    @case('en_nicaragua')
+                                        En Nicaragua
+                                        @break
+                                    @case('entregado')
                                         Entregado
                                         @break
                                     @case('cancelled')

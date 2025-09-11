@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('route_id')->constrained()->onDelete('cascade');
             $table->foreignId('box_id')->constrained()->onDelete('cascade');
             $table->string('code')->unique(); // Para tracking/QR
-            $table->enum('shipment_status', ['lead', 'ready', 'delivered', 'cancelled'])->default('lead');
+            $table->enum('shipment_status', ['por_recepcionar', 'recepcionado', 'dejado_almacen', 'en_nicaragua', 'entregado', 'cancelled'])->default('por_recepcionar');
             $table->decimal('sale_price_usd', 10, 2)->nullable();
             $table->decimal('declared_value', 10, 2)->default(0);
             $table->text('notes')->nullable();
