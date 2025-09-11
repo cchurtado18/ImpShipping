@@ -153,7 +153,7 @@ class ShipmentFormModal extends Component
             'box_id' => $this->selectedBox,
             'sale_price_usd' => $this->finalPrice,
             'notes' => $this->notes,
-            'shipment_status' => 'en_almacen',
+            'shipment_status' => 'por_recepcionar',
         ];
         
         if ($this->editingShipment) {

@@ -80,7 +80,7 @@ class ShipmentController extends Controller
                     'route_id' => $route->id,
                     'box_id' => $box ? $box->id : null,
                     'code' => $code,
-                    'shipment_status' => 'lead',
+                    'shipment_status' => 'por_recepcionar',
                     'sale_price_usd' => $totalPrice,
                     'declared_value' => 0,
                     'notes' => $request->input('notes') . "\nDimensiones: {$boxData['length']}\" × {$boxData['width']}\" × {$boxData['height']}\" ({$cubicFeet} ft³)" . 

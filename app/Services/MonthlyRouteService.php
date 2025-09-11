@@ -74,7 +74,7 @@ class MonthlyRouteService
             'profit' => $this->profit($route),
             'margin' => $this->margin($route),
             'shipments_count' => $route->shipments()->where('shipment_status', '!=', 'cancelled')->count(),
-            'delivered_count' => $route->shipments()->where('shipment_status', 'delivered')->count(),
+            'delivered_count' => $route->shipments()->where('shipment_status', 'entregado')->count(),
         ];
     }
 
