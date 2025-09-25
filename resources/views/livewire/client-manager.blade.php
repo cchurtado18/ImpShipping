@@ -2,13 +2,13 @@
     <!-- Header con estadísticas -->
     <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-gray-900">Gestión de Clientes</h2>
+            <h2 class="text-xl font-bold text-gray-900">Client Management</h2>
             <button wire:click="addClient" 
                     class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-                Agregar Cliente
+                Add Client
             </button>
         </div>
 
@@ -22,7 +22,7 @@
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-yellow-800">En Seguimiento</p>
+                        <p class="text-sm font-medium text-yellow-800">Following Up</p>
                         <p class="text-2xl font-bold text-yellow-900">{{ $statusCounts['en_seguimiento'] ?? 0 }}</p>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-green-800">Confirmados</p>
+                        <p class="text-sm font-medium text-green-800">Confirmed</p>
                         <p class="text-2xl font-bold text-green-900">{{ $statusCounts['confirmado'] ?? 0 }}</p>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-blue-800">Próxima Ruta</p>
+                        <p class="text-sm font-medium text-blue-800">Next Route</p>
                         <p class="text-2xl font-bold text-blue-900">{{ $statusCounts['proxima_ruta'] ?? 0 }}</p>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-red-800">Cancelados</p>
+                        <p class="text-sm font-medium text-red-800">Cancelled</p>
                         <p class="text-2xl font-bold text-red-900">{{ $statusCounts['ruta_cancelada'] ?? 0 }}</p>
                     </div>
                 </div>
@@ -77,13 +77,13 @@
         <div class="flex flex-col md:flex-row gap-4">
             <div class="flex-1">
                 <input wire:model.live="search" type="text" 
-                       placeholder="Buscar por nombre, teléfono o email..." 
+                       placeholder="Search by name, phone or email..." 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="md:w-48">
                 <select wire:model.live="stateFilter" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todos los estados de EE.UU.</option>
+                    <option value="">All US States</option>
                     <option value="AL">Alabama</option>
                     <option value="AK">Alaska</option>
                     <option value="AZ">Arizona</option>
@@ -140,11 +140,11 @@
             <div class="md:w-48">
                 <select wire:model.live="statusFilter" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todos los estados</option>
-                    <option value="en_seguimiento">En Seguimiento</option>
-                    <option value="confirmado">Confirmado</option>
-                    <option value="proxima_ruta">Próxima Ruta</option>
-                    <option value="ruta_cancelada">Ruta Cancelada</option>
+                    <option value="">All Statuses</option>
+                    <option value="en_seguimiento">Following Up</option>
+                    <option value="confirmado">Confirmed</option>
+                    <option value="proxima_ruta">Next Route</option>
+                    <option value="ruta_cancelada">Route Cancelled</option>
                 </select>
             </div>
         </div>
@@ -155,12 +155,12 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receptores</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Envíos</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipients</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shipments</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -184,10 +184,10 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <select wire:change="updateStatus({{ $client->id }}, $event.target.value)" 
                                 class="text-xs px-2 py-1 rounded-full font-medium border-0 focus:ring-2 focus:ring-blue-500 {{ $client->status_badge }}">
-                            <option value="en_seguimiento" {{ $client->status === 'en_seguimiento' ? 'selected' : '' }}>En Seguimiento</option>
-                            <option value="confirmado" {{ $client->status === 'confirmado' ? 'selected' : '' }}>Confirmado</option>
-                            <option value="proxima_ruta" {{ $client->status === 'proxima_ruta' ? 'selected' : '' }}>Próxima Ruta</option>
-                            <option value="ruta_cancelada" {{ $client->status === 'ruta_cancelada' ? 'selected' : '' }}>Ruta Cancelada</option>
+                            <option value="en_seguimiento" {{ $client->status === 'en_seguimiento' ? 'selected' : '' }}>Following Up</option>
+                            <option value="confirmado" {{ $client->status === 'confirmado' ? 'selected' : '' }}>Confirmed</option>
+                            <option value="proxima_ruta" {{ $client->status === 'proxima_ruta' ? 'selected' : '' }}>Next Route</option>
+                            <option value="ruta_cancelada" {{ $client->status === 'ruta_cancelada' ? 'selected' : '' }}>Route Cancelled</option>
                         </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -198,12 +198,12 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                         <button wire:click="editClient({{ $client->id }})" 
-                                class="text-blue-600 hover:text-blue-900">Editar</button>
+                                class="text-blue-600 hover:text-blue-900">Edit</button>
                         @if($client->shipments->count() === 0)
                         <button wire:click="deleteClient({{ $client->id }})" 
                                 class="text-red-600 hover:text-red-900"
-                                onclick="return confirm('¿Está seguro de eliminar este cliente?')">
-                            Eliminar
+                                onclick="return confirm('Are you sure you want to delete this client?')">
+                            Delete
                         </button>
                         @endif
                     </td>
@@ -211,7 +211,7 @@
                 @empty
                 <tr>
                     <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                        No hay clientes registrados.
+                        No clients registered.
                     </td>
                 </tr>
                 @endforelse
@@ -231,7 +231,7 @@
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-medium text-gray-900">
-                        {{ $editingClient ? 'Editar Cliente' : 'Agregar Nuevo Cliente' }}
+                        {{ $editingClient ? 'Edit Client' : 'Add New Client' }}
                     </h3>
                     <button wire:click="closeForm" class="text-gray-400 hover:text-gray-600">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,14 +243,14 @@
                 <form wire:submit="saveClient" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                             <input wire:model="full_name" type="text" 
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             @error('full_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
                             <input wire:model="us_phone" type="text" 
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             @error('us_phone') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -258,17 +258,17 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección en EE.UU. *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">US Address *</label>
                         <textarea wire:model="us_address" rows="3" 
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         @error('us_address') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado de EE.UU. *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">US State *</label>
                         <select wire:model="us_state" 
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Seleccionar estado...</option>
+                            <option value="">Select state...</option>
                             <option value="AL">Alabama</option>
                             <option value="AK">Alaska</option>
                             <option value="AZ">Arizona</option>
@@ -333,34 +333,34 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                             <select wire:model="status" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="en_seguimiento">En Seguimiento</option>
-                                <option value="confirmado">Confirmado</option>
-                                <option value="proxima_ruta">Próxima Ruta</option>
-                                <option value="ruta_cancelada">Ruta Cancelada</option>
+                                <option value="en_seguimiento">Following Up</option>
+                                <option value="confirmado">Confirmed</option>
+                                <option value="proxima_ruta">Next Route</option>
+                                <option value="ruta_cancelada">Route Cancelled</option>
                             </select>
                             @error('status') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                         <textarea wire:model="notes" rows="3" 
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  placeholder="Información adicional sobre el cliente..."></textarea>
+                                  placeholder="Additional information about the client..."></textarea>
                         @error('notes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
                     
                     <div class="flex justify-end space-x-3">
                         <button type="button" wire:click="closeForm" 
                                 class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-                            Cancelar
+                            Cancel
                         </button>
                         <button type="submit" 
                                 class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            {{ $editingClient ? 'Actualizar' : 'Guardar y Seguir' }}
+                            {{ $editingClient ? 'Update' : 'Save & Continue' }}
                         </button>
                     </div>
                 </form>

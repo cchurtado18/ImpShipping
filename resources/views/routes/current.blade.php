@@ -5,9 +5,9 @@
             <div class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Ruta: {{ $route->month }}</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">Route: {{ $route->month }}</h1>
                         <p class="mt-1 text-sm text-gray-600">
-                            Estado: 
+                            Status: 
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 @if($route->status === 'collecting') bg-blue-100 text-blue-800
                                 @elseif($route->status === 'in_transit') bg-yellow-100 text-yellow-800
@@ -23,20 +23,20 @@
                         <button type="button" 
                                 onclick="openShipmentModal()"
                                 class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Agregar Cliente a la Ruta
+                            Add Client to Route
                         </button>
                         <button type="button" 
                                 onclick="showAddExpenseModal()"
                                 class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 focus:bg-yellow-700 active:bg-yellow-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Agregar Gasto
+                            Add Expense
                         </button>
                         @if(auth()->user()->isAdmin())
                         <form method="POST" action="{{ route('routes.close', $route) }}" class="inline">
                             @csrf
                             <button type="submit" 
                                     class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                    onclick="return confirm('¿Está seguro de cerrar esta ruta?')">
-                                Cerrar Ruta
+                                    onclick="return confirm('Are you sure you want to close this route?')">
+                                Close Route
                             </button>
                         </form>
                         @endif
@@ -52,15 +52,15 @@
                 <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                     <button class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" 
                             onclick="showTab('shipments')">
-                        Envíos
+                        Shipments
                     </button>
                     <button class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" 
                             onclick="showTab('expenses')">
-                        Gastos
+                        Expenses
                     </button>
                     <button class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" 
                             onclick="showTab('summary')">
-                        Resumen
+                        Summary
                     </button>
                 </nav>
             </div>
@@ -88,7 +88,7 @@
             <div class="mt-3">
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-medium text-gray-900">Agregar Nuevo Envío</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Add New Shipment</h3>
                     <button onclick="closeShipmentModal()" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

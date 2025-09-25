@@ -4,13 +4,13 @@
         <div class="flex space-x-4 flex-1">
             <div class="max-w-sm">
                 <input wire:model.live="search" type="text" 
-                       placeholder="Buscar por nombre o teléfono..." 
+                       placeholder="Search by name or phone..." 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="max-w-xs">
                 <select wire:model.live="stateFilter" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todos los estados</option>
+                    <option value="">All States</option>
                     @foreach($states as $state)
                         <option value="{{ $state }}">{{ $state }}</option>
                     @endforeach
@@ -19,7 +19,7 @@
         </div>
         <button wire:click="addShipment" 
                 class="ml-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-            Agregar Envío
+            Add Shipment
         </button>
     </div>
 
@@ -28,14 +28,14 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receptor</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipient</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cobro</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -88,11 +88,11 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                         <button wire:click="editShipment({{ $shipment->id }})" 
-                                class="text-blue-600 hover:text-blue-900">Editar</button>
+                                class="text-blue-600 hover:text-blue-900">Edit</button>
                         <button wire:click="changeStatus({{ $shipment->id }})" 
-                                class="text-orange-600 hover:text-orange-900">📋 Estado</button>
+                                class="text-orange-600 hover:text-orange-900">📋 Status</button>
                         <button wire:click="quickPayment({{ $shipment->id }})" 
-                                class="text-purple-600 hover:text-purple-900">💰 Cobro</button>
+                                class="text-purple-600 hover:text-purple-900">💰 Payment</button>
                         <button wire:click="showQR({{ $shipment->id }})" 
                                 class="text-gray-600 hover:text-gray-900">QR</button>
                     </td>
@@ -100,7 +100,7 @@
                 @empty
                 <tr>
                     <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
-                        No hay envíos registrados para esta ruta.
+                        No shipments registered for this route.
                     </td>
                 </tr>
                 @endforelse

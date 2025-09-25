@@ -5,9 +5,9 @@
             <div class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Gestión de Clientes</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">Client Management</h1>
                         <p class="mt-1 text-sm text-gray-600">
-                            Administra y da seguimiento a todos los clientes del sistema
+                            Manage and track all clients in the system
                         </p>
                     </div>
                 </div>

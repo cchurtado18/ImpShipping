@@ -12,17 +12,17 @@
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <div class="text-center">
                     <h1 class="text-2xl font-bold text-gray-900 mb-2">IMPEF</h1>
-                    <p class="text-sm text-gray-600 mb-6">Seguimiento de Envío</p>
+                    <p class="text-sm text-gray-600 mb-6">Shipment Tracking</p>
                 </div>
 
                 <div class="space-y-4">
                     <div class="border-b border-gray-200 pb-4">
-                        <div class="text-sm font-medium text-gray-500">Código de Seguimiento</div>
+                        <div class="text-sm font-medium text-gray-500">Tracking Code</div>
                         <div class="mt-1 text-lg font-semibold text-gray-900">{{ $publicData['code'] }}</div>
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <div class="text-sm font-medium text-gray-500">Estado</div>
+                        <div class="text-sm font-medium text-gray-500">Status</div>
                         <div class="mt-1">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 @if($publicData['status'] === 'por_recepcionar') bg-gray-100 text-gray-800
@@ -34,22 +34,22 @@
                                 @endif">
                                 @switch($publicData['status'])
                                     @case('por_recepcionar')
-                                        Por Recepcionar
+                                        To Receive
                                         @break
                                     @case('recepcionado')
-                                        Recepcionado
+                                        Received
                                         @break
                                     @case('dejado_almacen')
-                                        Dejado en Almacén
+                                        Left at Warehouse
                                         @break
                                     @case('en_nicaragua')
-                                        En Nicaragua
+                                        In Nicaragua
                                         @break
                                     @case('entregado')
-                                        Entregado
+                                        Delivered
                                         @break
                                     @case('cancelled')
-                                        Cancelado
+                                        Cancelled
                                         @break
                                     @default
                                         {{ ucfirst($publicData['status']) }}
@@ -59,24 +59,24 @@
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <div class="text-sm font-medium text-gray-500">Departamento de Entrega</div>
+                        <div class="text-sm font-medium text-gray-500">Delivery Department</div>
                         <div class="mt-1 text-sm text-gray-900">{{ $publicData['department'] }}</div>
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <div class="text-sm font-medium text-gray-500">Ciudad de Entrega</div>
+                        <div class="text-sm font-medium text-gray-500">Delivery City</div>
                         <div class="mt-1 text-sm text-gray-900">{{ $publicData['city'] }}</div>
                     </div>
 
                     <div>
-                        <div class="text-sm font-medium text-gray-500">Mes de Ruta</div>
+                        <div class="text-sm font-medium text-gray-500">Route Month</div>
                         <div class="mt-1 text-sm text-gray-900">{{ $publicData['route_month'] }}</div>
                     </div>
                 </div>
 
                 <div class="mt-6 text-center">
                     <p class="text-xs text-gray-500">
-                        Para más información, contacte a su agente de envíos.
+                        For more information, contact your shipping agent.
                     </p>
                 </div>
             </div>

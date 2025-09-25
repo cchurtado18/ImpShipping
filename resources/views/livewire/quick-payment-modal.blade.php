@@ -6,9 +6,9 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-medium text-gray-900">
                         @if($editingPayment)
-                            Editar Pago
+                            Edit Payment
                         @else
-                            Gestión de Pagos
+                            Payment Management
                         @endif
                     </h3>
                     <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600">
@@ -21,13 +21,13 @@
                 @if($shipment)
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg">
                     <div class="text-sm text-gray-600">
-                        <div><strong>Cliente:</strong> {{ $shipment->client->full_name }}</div>
-                        <div><strong>Receptor:</strong> {{ $shipment->recipient->full_name }}</div>
-                        <div><strong>Código:</strong> {{ $shipment->code }}</div>
+                        <div><strong>Client:</strong> {{ $shipment->client->full_name }}</div>
+                        <div><strong>Recipient:</strong> {{ $shipment->recipient->full_name }}</div>
+                        <div><strong>Code:</strong> {{ $shipment->code }}</div>
                         <div><strong>Total:</strong> ${{ number_format($shipment->sale_price_usd, 2) }}</div>
-                        <div><strong>Pagado:</strong> ${{ number_format($shipment->total_paid, 2) }}</div>
-                        <div><strong>Restante:</strong> ${{ number_format($shipment->remaining_amount, 2) }}</div>
-                        <div><strong>Estado:</strong> 
+                        <div><strong>Paid:</strong> ${{ number_format($shipment->total_paid, 2) }}</div>
+                        <div><strong>Remaining:</strong> ${{ number_format($shipment->remaining_amount, 2) }}</div>
+                        <div><strong>Status:</strong> 
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 @if($shipment->payment_status === 'pending') bg-yellow-100 text-yellow-800
                                 @elseif($shipment->payment_status === 'partial') bg-purple-100 text-purple-800
@@ -44,7 +44,7 @@
                 <div class="mb-4">
                     <button wire:click="togglePaymentHistory" 
                             class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        {{ $showPaymentHistory ? 'Ocultar' : 'Mostrar' }} Historial de Pagos
+                        {{ $showPaymentHistory ? 'Hide' : 'Show' }} Payment History
                     </button>
                 </div>
 

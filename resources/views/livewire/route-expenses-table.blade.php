@@ -1,40 +1,40 @@
 <div>
     <!-- Formulario para agregar gasto -->
     <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Agregar Gasto</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add Expense</h3>
         <form wire:submit="addExpense" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                 <select wire:model="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Seleccionar...</option>
-                    <option value="fuel">Combustible</option>
-                    <option value="freight">Flete</option>
-                    <option value="warehouse">Almacén</option>
-                    <option value="taxes">Impuestos</option>
-                    <option value="toll">Peaje</option>
-                    <option value="per_diem">Viáticos</option>
-                    <option value="last_mile">Última Milla</option>
-                    <option value="other">Otros</option>
+                    <option value="">Select...</option>
+                    <option value="fuel">Fuel</option>
+                    <option value="freight">Freight</option>
+                    <option value="warehouse">Warehouse</option>
+                    <option value="taxes">Taxes</option>
+                    <option value="toll">Toll</option>
+                    <option value="per_diem">Per Diem</option>
+                    <option value="last_mile">Last Mile</option>
+                    <option value="other">Other</option>
                 </select>
                 @error('category') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Monto (USD)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Amount (USD)</label>
                 <input wire:model="amount" type="number" step="0.01" 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('amount') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <input wire:model="description" type="text" 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('description') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
                 <input wire:model="vendor" type="text" 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @error('vendor') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -43,7 +43,7 @@
             <div class="md:col-span-4">
                 <button type="submit" 
                         class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                    Agregar Gasto
+                    Add Expense
                 </button>
             </div>
         </form>

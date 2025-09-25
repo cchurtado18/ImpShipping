@@ -16,6 +16,8 @@ class ShipmentsTable extends Component
     public $stateFilter = '';
     public $showForm = false;
     public $editingShipment = null;
+    public $showDetailsModal = false;
+    public $selectedShipment = null;
 
     protected $listeners = ['shipmentAdded' => '$refresh', 'shipmentSaved' => '$refresh'];
 
@@ -84,5 +86,17 @@ class ShipmentsTable extends Component
     public function showQR(Shipment $shipment)
     {
         $this->dispatch('showQR', code: $shipment->code);
+    }
+
+    public function viewDetails(Shipment $shipment)
+    {
+        $this->selectedShipment = $shipment->load(['client', 'recipient', 'box', 'route', 'payments']);
+        $this->showDetailsModal = true;
+    }
+
+    public function closeDetailsModal()
+    {
+        $this->showDetailsModal = false;
+        $this->selectedShipment = null;
     }
 }
