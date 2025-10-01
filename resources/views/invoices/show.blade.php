@@ -13,15 +13,21 @@
                     <div class="flex space-x-3">
                         <a href="{{ route('invoices.index') }}" 
                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                            Back to Invoices
+                            Volver a Facturas
                         </a>
+                        @if($invoice->invoice_status === 'pending')
                         <a href="{{ route('invoices.edit', $invoice) }}" 
                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Edit Invoice
+                            Editar Factura
+                        </a>
+                        @endif
+                        <a href="{{ route('invoices.download-pdf', $invoice) }}" 
+                           class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            📄 Descargar PDF
                         </a>
                         <button onclick="window.print()" 
                                 class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                            Print Invoice
+                            🖨️ Imprimir
                         </button>
                     </div>
                 </div>

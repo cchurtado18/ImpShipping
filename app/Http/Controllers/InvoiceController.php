@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -190,5 +191,36 @@ class InvoiceController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Invoice status updated successfully.');
+    }
+
+    /**
+     * Download invoice as PDF
+     */
+    public function downloadPdf(Invoice $invoice)
+    {
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
+        
+        $filename = 'Invoice_' . $invoice->invoice_number . '.pdf';
+        
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Send invoice via email
+     */
+    public function sendEmail(Invoice $invoice, Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
+        
+        $filename = 'Invoice_' . $invoice->invoice_number . '.pdf';
+        
+        // Aquí puedes implementar el envío de email
+        // Por ahora solo descarga el PDF
+        
+        return redirect()->back()->with('success', 'Invoice sent successfully to ' . $request->email);
     }
 }

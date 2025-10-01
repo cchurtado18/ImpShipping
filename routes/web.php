@@ -86,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/invoices/{invoice}/mark-paid', [App\Http\Controllers\InvoiceController::class, 'markAsPaid'])->name('invoices.mark-paid');
     Route::post('/invoices/{invoice}/mark-cancelled', [App\Http\Controllers\InvoiceController::class, 'markAsCancelled'])->name('invoices.mark-cancelled');
     Route::post('/invoices/{invoice}/change-status', [App\Http\Controllers\InvoiceController::class, 'changeInvoiceStatus'])->name('invoices.change-status');
+    Route::get('/invoices/{invoice}/download-pdf', [App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
+    Route::post('/invoices/{invoice}/send-email', [App\Http\Controllers\InvoiceController::class, 'sendEmail'])->name('invoices.send-email');
     
     // Gestión de clientes
     Route::get('/clients', function () {

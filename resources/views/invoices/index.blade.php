@@ -100,6 +100,12 @@
                                     👁️ View
                                 </a>
                                 
+                                <!-- Download PDF Button -->
+                                <a href="{{ route('invoices.download-pdf', $invoice) }}" 
+                                   class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                                    📄 PDF
+                                </a>
+                                
                                 <!-- Edit Button -->
                                 @if($invoice->invoice_status === 'pending')
                                     <a href="{{ route('invoices.edit', $invoice) }}" 
