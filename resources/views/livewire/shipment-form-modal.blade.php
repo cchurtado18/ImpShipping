@@ -138,7 +138,7 @@
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-900">
-                        📋 Previsualización del Envío
+                        📋 Shipment Preview
                     </h3>
                     <button wire:click="hidePreview" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,57 +151,57 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Información del Cliente -->
                     <div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="text-lg font-semibold text-blue-800 mb-3">👤 Información del Cliente</h4>
+                        <h4 class="text-lg font-semibold text-blue-800 mb-3">👤 Client Information</h4>
                         @if($this->selectedClient)
                             <div class="space-y-2 text-sm">
-                                <p><strong>Nombre:</strong> {{ $this->selectedClient->full_name }}</p>
-                                <p><strong>Teléfono US:</strong> {{ $this->selectedClient->us_phone }}</p>
+                                <p><strong>Name:</strong> {{ $this->selectedClient->full_name }}</p>
+                                <p><strong>US Phone:</strong> {{ $this->selectedClient->us_phone }}</p>
                                 <p><strong>Email:</strong> {{ $this->selectedClient->email }}</p>
-                                <p><strong>Estado:</strong> {{ $this->selectedClient->us_state }}</p>
+                                <p><strong>State:</strong> {{ $this->selectedClient->us_state }}</p>
                             </div>
                         @else
-                            <p class="text-red-500">No se ha seleccionado un cliente</p>
+                            <p class="text-red-500">No client selected</p>
                         @endif
                     </div>
 
                     <!-- Información del Receptor -->
                     <div class="bg-green-50 p-4 rounded-lg">
-                        <h4 class="text-lg font-semibold text-green-800 mb-3">📦 Información del Receptor</h4>
+                        <h4 class="text-lg font-semibold text-green-800 mb-3">📦 Recipient Information</h4>
                         @if($this->selectedRecipient)
                             <div class="space-y-2 text-sm">
-                                <p><strong>Nombre:</strong> {{ $this->selectedRecipient->full_name }}</p>
-                                <p><strong>Teléfono:</strong> {{ $this->selectedRecipient->ni_phone }}</p>
-                                <p><strong>Edad:</strong> {{ $this->selectedRecipient->age ?? 'No especificada' }}</p>
-                                <p><strong>Departamento:</strong> {{ $this->selectedRecipient->ni_department }}</p>
-                                <p><strong>Ciudad:</strong> {{ $this->selectedRecipient->ni_city }}</p>
-                                <p><strong>Dirección:</strong> {{ $this->selectedRecipient->ni_address }}</p>
+                                <p><strong>Name:</strong> {{ $this->selectedRecipient->full_name }}</p>
+                                <p><strong>Phone:</strong> {{ $this->selectedRecipient->ni_phone }}</p>
+                                <p><strong>Age:</strong> {{ $this->selectedRecipient->age ?? 'Not specified' }}</p>
+                                <p><strong>Department:</strong> {{ $this->selectedRecipient->ni_department }}</p>
+                                <p><strong>City:</strong> {{ $this->selectedRecipient->ni_city }}</p>
+                                <p><strong>Address:</strong> {{ $this->selectedRecipient->ni_address }}</p>
                             </div>
                         @else
-                            <p class="text-red-500">No se ha seleccionado un receptor</p>
+                            <p class="text-red-500">No recipient selected</p>
                         @endif
                     </div>
 
                     <!-- Información de la Caja -->
                     <div class="bg-yellow-50 p-4 rounded-lg">
-                        <h4 class="text-lg font-semibold text-yellow-800 mb-3">📦 Información de la Caja</h4>
+                        <h4 class="text-lg font-semibold text-yellow-800 mb-3">📦 Box Information</h4>
                         @if($this->selectedBox)
                             <div class="space-y-2 text-sm">
-                                <p><strong>Código:</strong> {{ $this->selectedBox->code }}</p>
-                                <p><strong>Dimensiones:</strong> {{ $this->selectedBox->length_in }}" × {{ $this->selectedBox->width_in }}" × {{ $this->selectedBox->height_in }}"</p>
-                                <p><strong>Volumen:</strong> {{ number_format(($this->selectedBox->length_in * $this->selectedBox->width_in * $this->selectedBox->height_in) / 1728, 2) }} ft³</p>
-                                <p><strong>Precio Base:</strong> ${{ number_format($this->selectedBox->base_price_usd, 2) }}</p>
+                                <p><strong>Code:</strong> {{ $this->selectedBox->code }}</p>
+                                <p><strong>Dimensions:</strong> {{ $this->selectedBox->length_in }}" × {{ $this->selectedBox->width_in }}" × {{ $this->selectedBox->height_in }}"</p>
+                                <p><strong>Volume:</strong> {{ number_format(($this->selectedBox->length_in * $this->selectedBox->width_in * $this->selectedBox->height_in) / 1728, 2) }} ft³</p>
+                                <p><strong>Base Price:</strong> ${{ number_format($this->selectedBox->base_price_usd, 2) }}</p>
                             </div>
                         @else
-                            <p class="text-red-500">No se ha seleccionado una caja</p>
+                            <p class="text-red-500">No box selected</p>
                         @endif
                     </div>
 
                     <!-- Información del Envío -->
                     <div class="bg-purple-50 p-4 rounded-lg">
-                        <h4 class="text-lg font-semibold text-purple-800 mb-3">🚚 Información del Envío</h4>
+                        <h4 class="text-lg font-semibold text-purple-800 mb-3">🚚 Shipment Information</h4>
                         <div class="space-y-2 text-sm">
-                            <p><strong>Ruta:</strong> {{ $route->name ?? 'Ruta Actual' }}</p>
-                            <p><strong>Estado:</strong> 
+                            <p><strong>Route:</strong> {{ $route->name ?? 'Current Route' }}</p>
+                            <p><strong>Status:</strong> 
                                 <span class="px-2 py-1 rounded-full text-xs font-medium
                                     @if($shipmentStatus === 'por_recepcionar') bg-gray-100 text-gray-800
                                     @elseif($shipmentStatus === 'recepcionado') bg-blue-100 text-blue-800
@@ -211,18 +211,18 @@
                                     @else bg-red-100 text-red-800
                                     @endif">
                                     @switch($shipmentStatus)
-                                        @case('por_recepcionar') Por Recepcionar @break
-                                        @case('recepcionado') Recepcionado @break
-                                        @case('dejado_almacen') Dejado en Almacén @break
-                                        @case('en_nicaragua') En Nicaragua @break
-                                        @case('entregado') Entregado @break
+                                        @case('por_recepcionar') To Receive @break
+                                        @case('recepcionado') Received @break
+                                        @case('dejado_almacen') Left at Warehouse @break
+                                        @case('en_nicaragua') In Nicaragua @break
+                                        @case('entregado') Delivered @break
                                         @default {{ ucfirst($shipmentStatus) }}
                                     @endswitch
                                 </span>
                             </p>
-                            <p><strong>Precio Final:</strong> <span class="text-lg font-bold text-green-600">${{ number_format($finalPrice, 2) }}</span></p>
+                            <p><strong>Final Price:</strong> <span class="text-lg font-bold text-green-600">${{ number_format($finalPrice, 2) }}</span></p>
                             @if($notes)
-                                <p><strong>Notas:</strong> {{ $notes }}</p>
+                                <p><strong>Notes:</strong> {{ $notes }}</p>
                             @endif
                         </div>
                     </div>

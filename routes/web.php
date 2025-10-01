@@ -46,20 +46,20 @@ Route::middleware(['auth'])->group(function () {
     
                 // Rutas
             Route::get('/routes/current', function () {
-                $route = \App\Models\Route::where('status', '!=', 'closed')
-                    ->orderBy('created_at', 'desc')
-                    ->first();
+                // Buscar ruta activa primero
+                $route = \App\Models\Route::where('is_active', true)->first();
                 
                 if (!$route) {
-                    // Crear nueva ruta si no existe
-                    $route = \App\Models\Route::create([
-                        'month' => now()->format('Y-m'),
-                        'status' => 'collecting',
-                        'collection_start_at' => now(),
-                        'cutoff_at' => now()->addDays(15),
-                        'departure_at' => now()->addDays(20),
-                        'arrival_at' => now()->addDays(25),
-                    ]);
+                    // Si no hay ruta activa, buscar la más reciente que no esté cerrada
+                    $route = \App\Models\Route::where('status', '!=', 'closed')
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+                }
+                
+                if (!$route) {
+                    // Si no hay ninguna ruta, redirigir a la gestión de rutas
+                    return redirect()->route('routes.index')
+                        ->with('info', 'No active route found. Please create a route first.');
                 }
                 
                 return view('routes.current', compact('route'));
@@ -68,6 +68,24 @@ Route::middleware(['auth'])->group(function () {
     
 
     
+    
+    // Gestión de rutas
+    Route::get('/routes', function () {
+        return view('routes.index');
+    })->name('routes.index');
+    
+    // Clientes de una ruta específica
+    Route::get('/routes/{route}/clients', function (\App\Models\Route $route) {
+        $eligibleClients = $route->getEligibleClients();
+        return view('routes.clients', compact('route', 'eligibleClients'));
+    })->name('routes.clients');
+    
+    // Gestión de facturas
+    Route::resource('invoices', App\Http\Controllers\InvoiceController::class);
+    Route::post('/invoices/{invoice}/mark-sent', [App\Http\Controllers\InvoiceController::class, 'markAsSent'])->name('invoices.mark-sent');
+    Route::post('/invoices/{invoice}/mark-paid', [App\Http\Controllers\InvoiceController::class, 'markAsPaid'])->name('invoices.mark-paid');
+    Route::post('/invoices/{invoice}/mark-cancelled', [App\Http\Controllers\InvoiceController::class, 'markAsCancelled'])->name('invoices.mark-cancelled');
+    Route::post('/invoices/{invoice}/change-status', [App\Http\Controllers\InvoiceController::class, 'changeInvoiceStatus'])->name('invoices.change-status');
     
     // Gestión de clientes
     Route::get('/clients', function () {

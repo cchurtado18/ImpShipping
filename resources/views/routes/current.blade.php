@@ -1,22 +1,48 @@
 <x-app-layout>
-    <div class="space-y-6">
+    <div class="space-y-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <!-- Header -->
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">Route: {{ $route->month }}</h1>
-                        <p class="mt-1 text-sm text-gray-600">
-                            Status: 
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($route->status === 'collecting') bg-blue-100 text-blue-800
-                                @elseif($route->status === 'in_transit') bg-yellow-100 text-yellow-800
-                                @elseif($route->status === 'arrived') bg-green-100 text-green-800
-                                @else bg-gray-100 text-gray-800
-                                @endif">
-                                {{ ucfirst(str_replace('_', ' ', $route->status)) }}
-                            </span>
-                        </p>
+                        <div class="mt-1 flex items-center space-x-4">
+                            <p class="text-sm text-gray-600">
+                                Status: 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    @if($route->status === 'collecting') bg-blue-100 text-blue-800
+                                    @elseif($route->status === 'in_transit') bg-yellow-100 text-yellow-800
+                                    @elseif($route->status === 'arrived') bg-green-100 text-green-800
+                                    @else bg-gray-100 text-gray-800
+                                    @endif">
+                                    {{ ucfirst(str_replace('_', ' ', $route->status)) }}
+                                </span>
+                            </p>
+                            @if($route->responsible)
+                            <p class="text-sm text-gray-600">
+                                Responsible: 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    {{ $route->responsible }}
+                                </span>
+                            </p>
+                            @endif
+                            @if($route->states && count($route->states) > 0)
+                            <p class="text-sm text-gray-600">
+                                States: 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    {{ $route->formatted_states }}
+                                </span>
+                            </p>
+                            @endif
+                            @if($route->route_start_date && $route->route_end_date)
+                            <p class="text-sm text-gray-600">
+                                Route Period: 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ $route->route_start_date->format('M d, Y') }} - {{ $route->route_end_date->format('M d, Y') }}
+                                </span>
+                            </p>
+                            @endif
+                        </div>
                     </div>
                     @if($route->status !== 'closed')
                     <div class="flex space-x-3">
@@ -49,7 +75,7 @@
         <!-- Tabs -->
         <div class="bg-white shadow-sm sm:rounded-lg">
             <div class="border-b border-gray-200">
-                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
                     <button class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" 
                             onclick="showTab('shipments')">
                         Shipments
@@ -675,37 +701,37 @@
                     // Modo volumétrico
                     weightSection.classList.add('hidden');
                     
-                    // Aplicar tu fórmula de precios
+                    // Aplicar nueva fórmula de precios
                     if (cubicFeet >= 2.90 && cubicFeet <= 3.89) {
-                        price = cubicFeet * 49;
+                        price = cubicFeet * 55.52;
                     } else if (cubicFeet >= 3.90 && cubicFeet <= 4.89) {
-                        price = cubicFeet * 45;
+                        price = cubicFeet * 51.52;
                     } else if (cubicFeet >= 4.90 && cubicFeet <= 5.89) {
-                        price = cubicFeet * 42.5;
+                        price = cubicFeet * 49.02;
                     } else if (cubicFeet >= 5.90 && cubicFeet <= 6.89) {
-                        price = cubicFeet * 39;
+                        price = cubicFeet * 45.52;
                     } else if (cubicFeet >= 6.90 && cubicFeet <= 7.89) {
-                        price = cubicFeet * 35;
+                        price = cubicFeet * 41.52;
                     } else if (cubicFeet >= 7.90 && cubicFeet <= 8.89) {
-                        price = cubicFeet * 32;
+                        price = cubicFeet * 35.75;
                     } else if (cubicFeet >= 8.90 && cubicFeet <= 9.89) {
-                        price = cubicFeet * 31;
+                        price = cubicFeet * 34.75;
                     } else if (cubicFeet >= 9.90 && cubicFeet <= 10.89) {
-                        price = cubicFeet * 29.5;
+                        price = cubicFeet * 33.25;
                     } else if (cubicFeet >= 10.90 && cubicFeet <= 11.89) {
-                        price = cubicFeet * 29;
+                        price = cubicFeet * 32.75;
                     } else if (cubicFeet >= 11.90 && cubicFeet <= 12.89) {
-                        price = cubicFeet * 28;
+                        price = cubicFeet * 31.75;
                     } else if (cubicFeet >= 12.90 && cubicFeet <= 13.89) {
-                        price = cubicFeet * 26.5;
+                        price = cubicFeet * 30.25;
                     } else if (cubicFeet >= 13.90 && cubicFeet <= 14.89) {
-                        price = cubicFeet * 25.5;
+                        price = cubicFeet * 29.25;
                     } else if (cubicFeet >= 14.90 && cubicFeet <= 16.99) {
-                        price = cubicFeet * 24.5;
+                        price = cubicFeet * 28.25;
                     } else if (cubicFeet >= 17 && cubicFeet <= 19.99) {
-                        price = cubicFeet * 24;
+                        price = cubicFeet * 27.75;
                     } else if (cubicFeet >= 20) {
-                        price = cubicFeet * 22.75;
+                        price = cubicFeet * 25.75;
                     }
                     
                     price = Math.round(price);

@@ -25,11 +25,13 @@ class Shipment extends Model
         'sale_price_usd',
         'declared_value',
         'notes',
+        'invoiced',
     ];
 
     protected $casts = [
         'sale_price_usd' => 'decimal:2',
         'declared_value' => 'decimal:2',
+        'invoiced' => 'boolean',
     ];
 
     protected static function boot()

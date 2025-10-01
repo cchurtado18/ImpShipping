@@ -63,14 +63,12 @@ class ShipmentsTable extends Component
 
     public function addShipment()
     {
-        $this->showForm = true;
-        $this->editingShipment = null;
+        $this->dispatch('openShipmentModal');
     }
 
     public function editShipment(Shipment $shipment)
     {
-        $this->editingShipment = $shipment;
-        $this->showForm = true;
+        $this->dispatch('openShipmentModal', shipmentId: $shipment->id);
     }
 
     public function changeStatus(Shipment $shipment)
@@ -98,5 +96,25 @@ class ShipmentsTable extends Component
     {
         $this->showDetailsModal = false;
         $this->selectedShipment = null;
+    }
+
+    public function deleteShipment(Shipment $shipment)
+    {
+        try {
+            // Eliminar pagos relacionados primero
+            $shipment->payments()->delete();
+            
+            // Eliminar el envío
+            $shipment->delete();
+            
+            session()->flash('success', 'Shipment deleted successfully.');
+            $this->dispatch('shipmentDeleted');
+            
+            // Refrescar la tabla
+            $this->render();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+        }
     }
 }

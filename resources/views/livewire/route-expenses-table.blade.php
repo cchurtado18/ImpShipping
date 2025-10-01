@@ -50,7 +50,7 @@
     </div>
 
     <!-- Tabla de gastos -->
-    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div class="bg-white shadow-sm rounded-lg overflow-x-auto">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Gastos de la Ruta</h3>
             <p class="text-sm text-gray-600">Total: ${{ number_format($total, 2) }}</p>

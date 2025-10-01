@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Recipient;
 use App\Models\Route;
 use App\Models\Box;
+use App\Services\PricingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -126,44 +127,6 @@ class ShipmentController extends Controller
 
     private function calculateBoxPrice($cubicFeet, $boxData)
     {
-        // Si es caja pequeña, usar cálculo por peso
-        if ($cubicFeet >= 0.1 && $cubicFeet <= 2.99 && isset($boxData['weight'])) {
-            return $boxData['weight']['lbs'] * $boxData['weight']['rate'];
-        }
-
-        // Usar la fórmula volumétrica
-        if ($cubicFeet >= 2.90 && $cubicFeet <= 3.89) {
-            return round($cubicFeet * 49);
-        } elseif ($cubicFeet >= 3.90 && $cubicFeet <= 4.89) {
-            return round($cubicFeet * 45);
-        } elseif ($cubicFeet >= 4.90 && $cubicFeet <= 5.89) {
-            return round($cubicFeet * 42.5);
-        } elseif ($cubicFeet >= 5.90 && $cubicFeet <= 6.89) {
-            return round($cubicFeet * 39);
-        } elseif ($cubicFeet >= 6.90 && $cubicFeet <= 7.89) {
-            return round($cubicFeet * 35);
-        } elseif ($cubicFeet >= 7.90 && $cubicFeet <= 8.89) {
-            return round($cubicFeet * 32);
-        } elseif ($cubicFeet >= 8.90 && $cubicFeet <= 9.89) {
-            return round($cubicFeet * 31);
-        } elseif ($cubicFeet >= 9.90 && $cubicFeet <= 10.89) {
-            return round($cubicFeet * 29.5);
-        } elseif ($cubicFeet >= 10.90 && $cubicFeet <= 11.89) {
-            return round($cubicFeet * 29);
-        } elseif ($cubicFeet >= 11.90 && $cubicFeet <= 12.89) {
-            return round($cubicFeet * 28);
-        } elseif ($cubicFeet >= 12.90 && $cubicFeet <= 13.89) {
-            return round($cubicFeet * 26.5);
-        } elseif ($cubicFeet >= 13.90 && $cubicFeet <= 14.89) {
-            return round($cubicFeet * 25.5);
-        } elseif ($cubicFeet >= 14.90 && $cubicFeet <= 16.99) {
-            return round($cubicFeet * 24.5);
-        } elseif ($cubicFeet >= 17 && $cubicFeet <= 19.99) {
-            return round($cubicFeet * 24);
-        } elseif ($cubicFeet >= 20) {
-            return round($cubicFeet * 22.75);
-        }
-
-        return 0;
+        return PricingService::calculateBoxPrice($cubicFeet, $boxData['weight'] ?? null);
     }
 }

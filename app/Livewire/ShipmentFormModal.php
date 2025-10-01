@@ -33,7 +33,7 @@ class ShipmentFormModal extends Component
     public $shipmentStatus = 'por_recepcionar';
     public $notes = '';
     
-    protected $listeners = ['clientSelected'];
+    protected $listeners = ['clientSelected', 'openShipmentModal'];
     
     public function mount($route = null)
     {
@@ -181,6 +181,11 @@ class ShipmentFormModal extends Component
     public function getSelectedBoxProperty()
     {
         return $this->selectedBox ? Box::find($this->selectedBox) : null;
+    }
+
+    public function openShipmentModal($shipmentId = null)
+    {
+        $this->showShipmentForm($shipmentId);
     }
     
     public function render()
