@@ -5,73 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factura #{{ $invoice->invoice_number }}</title>
     <style>
+        @page {
+            margin: 15mm;
+            size: letter;
+        }
         body {
             font-family: Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.6;
+            font-size: 11px;
+            line-height: 1.4;
             color: #333;
+            margin: 0;
+            padding: 0;
         }
         .header {
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .company-info {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         .company-name {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .invoice-number {
             background-color: #2563eb;
             color: white;
-            padding: 10px 20px;
-            font-size: 20px;
+            padding: 8px 16px;
+            font-size: 18px;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         .info-grid {
             display: table;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .info-col {
             display: table-cell;
             width: 50%;
-            padding: 15px;
+            padding: 10px;
             background-color: #f9fafb;
             vertical-align: top;
         }
         .info-col h3 {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             color: #1f2937;
         }
         .info-col p {
-            margin: 5px 0;
-            font-size: 11px;
+            margin: 3px 0;
+            font-size: 10px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         th {
             background-color: #0d9488;
             color: white;
-            padding: 12px 10px;
+            padding: 8px;
             text-align: left;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 10px;
+            font-size: 9px;
         }
         td {
             border: 1px solid #d1d5db;
-            padding: 10px;
-            font-size: 11px;
+            padding: 6px 8px;
+            font-size: 10px;
         }
         .text-right {
             text-align: right;
@@ -84,22 +90,23 @@
             font-weight: bold;
         }
         .grand-total {
-            font-size: 14px;
+            font-size: 12px;
             color: #059669;
         }
         .disclaimer {
             background-color: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 10px;
-            margin-top: 20px;
-            font-size: 10px;
+            border-left: 3px solid #f59e0b;
+            padding: 8px;
+            margin-top: 12px;
+            font-size: 9px;
+            line-height: 1.3;
         }
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e5e7eb;
-            font-size: 10px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 9px;
             color: #6b7280;
         }
     </style>
@@ -111,9 +118,7 @@
             <div class="company-name">IMPERIO SHIPPING CORP.</div>
             <p><strong>Teléfono:</strong> +1 (305) 890-4018</p>
             <p><strong>Email:</strong> imperioshipping@usa.com</p>
-            <p><strong>Dirección:</strong></p>
-            <p>Residencial Vistas de Equípela, casa A3-11</p>
-            <p>Esquipulas, Managua</p>
+            <p><strong>Dirección:</strong> Residencial Vistas de Equípela, casa A3-11, Esquipulas, Managua</p>
         </div>
         
         <div class="invoice-number">
@@ -133,15 +138,13 @@
             <h3>Expedidor</h3>
             <p><strong>Nombre:</strong> {{ $invoice->sender_name }}</p>
             <p><strong>Teléfono:</strong> {{ $invoice->sender_phone }}</p>
-            <p><strong>Dirección:</strong></p>
-            <p>{{ $invoice->sender_address }}</p>
+            <p><strong>Dirección:</strong> {{ $invoice->sender_address }}</p>
         </div>
         <div class="info-col">
             <h3>Recibir</h3>
             <p><strong>Nombre:</strong> {{ $invoice->recipient_name }}</p>
             <p><strong>Teléfono:</strong> {{ $invoice->recipient_phone }}</p>
-            <p><strong>Dirección:</strong></p>
-            <p>{{ $invoice->recipient_address }}</p>
+            <p><strong>Dirección:</strong> {{ $invoice->recipient_address }}</p>
         </div>
     </div>
 
@@ -187,9 +190,9 @@
     </div>
 
     @if($invoice->notes)
-    <div style="margin-top: 20px; background-color: #eff6ff; padding: 10px; border-left: 4px solid #3b82f6;">
+    <div style="margin-top: 10px; background-color: #eff6ff; padding: 8px; border-left: 3px solid #3b82f6; font-size: 9px;">
         <strong>Notas:</strong>
-        <p>{{ $invoice->notes }}</p>
+        <p style="margin: 4px 0 0 0;">{{ $invoice->notes }}</p>
     </div>
     @endif
 
