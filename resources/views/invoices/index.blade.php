@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="space-y-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="space-y-6">
         <!-- Header -->
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6">
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Invoices Table -->
-        <div class="bg-white shadow-sm rounded-lg overflow-x-auto">
+        <div class="bg-white shadow-sm rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -93,7 +93,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex flex-wrap gap-2">
+                            <div class="flex space-x-2">
                                 <!-- View Button -->
                                 <a href="{{ route('invoices.show', $invoice) }}" 
                                    class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors">

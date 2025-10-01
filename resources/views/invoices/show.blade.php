@@ -13,21 +13,21 @@
                     <div class="flex space-x-3">
                         <a href="{{ route('invoices.index') }}" 
                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                            Volver a Facturas
+                            Back to Invoices
                         </a>
                         @if($invoice->invoice_status === 'pending')
                         <a href="{{ route('invoices.edit', $invoice) }}" 
                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Editar Factura
+                            Edit Invoice
                         </a>
                         @endif
                         <a href="{{ route('invoices.download-pdf', $invoice) }}" 
                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                            📄 Descargar PDF
+                            📄 Download PDF
                         </a>
                         <button onclick="window.print()" 
                                 class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                            🖨️ Imprimir
+                            🖨️ Print
                         </button>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                             @if($invoice->due_date)
                                 <p><strong>Fecha de Vencimiento:</strong> {{ $invoice->due_date->format('d/m/Y') }}</p>
                             @endif
-                            <p><strong>Términos:</strong> {{ $invoice->terms }}</p>
+                            <p><strong>Tiempo de Entrega:</strong> {{ $invoice->terms }}</p>
                         </div>
                     </div>
                 </div>

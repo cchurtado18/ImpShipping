@@ -24,8 +24,9 @@
                     <div class="flex">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <a href="{{ route('dashboard') }}" class="text-xl font-bold text-gray-900">
-                                IMPEF
+                            <a href="{{ route('dashboard') }}" class="flex items-center space-x-3">
+                                <img src="{{ asset('images/logos/ImpShipping.jpeg') }}" alt="IMPEF Logo" class="h-8 w-8 rounded object-cover">
+                                <span class="text-xl font-bold text-gray-900">IMPEF</span>
                             </a>
                         </div>
 

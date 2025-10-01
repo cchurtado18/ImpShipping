@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factura #{{ $invoice->invoice_number }}</title>
+    <title>Invoice #{{ $invoice->invoice_number }}</title>
     <style>
         @page {
             margin: 15mm;
@@ -121,21 +121,24 @@
             <p><strong>Dirección:</strong> Residencial Vistas de Equípela, casa A3-11, Esquipulas, Managua</p>
         </div>
         
+        <div class="company-logo" style="text-align: right; margin-bottom: 10px;">
+            <img src="{{ public_path('images/logos/ImpShipping.jpeg') }}" alt="IMPEF Logo" style="height: 50px; width: 50px; border-radius: 6px; object-fit: cover;">
+        </div>
         <div class="invoice-number">
-            Factura #{{ $invoice->invoice_number }}
+            Invoice #{{ $invoice->invoice_number }}
         </div>
         
-        <p><strong>Fecha:</strong> {{ $invoice->invoice_date->format('d/m/Y') }}</p>
+        <p><strong>Date:</strong> {{ $invoice->invoice_date->format('d/m/Y') }}</p>
         @if($invoice->due_date)
-            <p><strong>Fecha de Vencimiento:</strong> {{ $invoice->due_date->format('d/m/Y') }}</p>
+            <p><strong>Due Date:</strong> {{ $invoice->due_date->format('d/m/Y') }}</p>
         @endif
-        <p><strong>Términos:</strong> {{ $invoice->terms }}</p>
+        <p><strong>Delivery Time:</strong> {{ $invoice->terms }}</p>
     </div>
 
     <!-- Sender and Recipient Information -->
     <div class="info-grid">
         <div class="info-col">
-            <h3>Expedidor</h3>
+            <h3>Sender</h3>
             <p><strong>Nombre:</strong> {{ $invoice->sender_name }}</p>
             <p><strong>Teléfono:</strong> {{ $invoice->sender_phone }}</p>
             <p><strong>Dirección:</strong> {{ $invoice->sender_address }}</p>
@@ -152,10 +155,10 @@
     <table>
         <thead>
             <tr>
-                <th style="text-align: left;">Descripción del Servicio</th>
-                <th style="text-align: center; width: 15%;">Cantidad</th>
-                <th style="text-align: center; width: 20%;">Precio Unitario</th>
-                <th style="text-align: center; width: 20%;">Costo Total</th>
+                <th style="text-align: left;">Service Description</th>
+                <th style="text-align: center; width: 15%;">Quantity</th>
+                <th style="text-align: center; width: 20%;">Unit Price</th>
+                <th style="text-align: center; width: 20%;">Total Cost</th>
             </tr>
         </thead>
         <tbody>
@@ -191,7 +194,7 @@
 
     @if($invoice->notes)
     <div style="margin-top: 10px; background-color: #eff6ff; padding: 8px; border-left: 3px solid #3b82f6; font-size: 9px;">
-        <strong>Notas:</strong>
+        <strong>Notes:</strong>
         <p style="margin: 4px 0 0 0;">{{ $invoice->notes }}</p>
     </div>
     @endif

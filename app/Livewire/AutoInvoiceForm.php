@@ -31,7 +31,7 @@ class AutoInvoiceForm extends Component
     public $tax = 0;
     public $tax_amount = 0;
     public $due_date = '';
-    public $terms = '30 Days';
+    public $terms = '25 a 30 días';
     public $notes = '';
 
     public function mount()

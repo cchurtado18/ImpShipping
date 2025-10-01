@@ -54,7 +54,7 @@ class InvoiceController extends Controller
             'invoice_number' => Invoice::generateInvoiceNumber(),
             'invoice_date' => now()->toDateString(),
             'due_date' => $request->due_date,
-            'terms' => $request->terms ?? '30 Days',
+            'terms' => $request->terms ?? '25 a 30 días',
             'sender_name' => $request->sender_name,
             'sender_phone' => $request->sender_phone,
             'sender_address' => $request->sender_address,
@@ -124,7 +124,7 @@ class InvoiceController extends Controller
 
         $invoice->update([
             'due_date' => $request->due_date,
-            'terms' => $request->terms ?? '30 Days',
+            'terms' => $request->terms ?? '25 a 30 días',
             'sender_name' => $request->sender_name,
             'sender_phone' => $request->sender_phone,
             'sender_address' => $request->sender_address,
