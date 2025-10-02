@@ -18,10 +18,13 @@ class Client extends Model
         'email',
         'notes',
         'status',
+        'next_followup_at',
+        'followup_note',
     ];
 
     protected $casts = [
         'status' => 'string',
+        'next_followup_at' => 'datetime',
     ];
 
     public function recipients(): HasMany

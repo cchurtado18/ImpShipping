@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\RoutesController;
 use App\Http\Controllers\TrackingController;
 use Illuminate\Support\Facades\Route;
@@ -93,6 +94,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/clients', function () {
         return view('clients.index');
     })->name('clients.index');
+    
+    // Seguimientos de clientes
+    Route::get('/followups', [FollowupController::class, 'index'])->name('followups.index');
+    Route::post('/followups/{client}/mark-done', [FollowupController::class, 'markDone'])->name('followups.mark-done');
+    Route::post('/followups/{client}/postpone', [FollowupController::class, 'postpone'])->name('followups.postpone');
     
     // Envíos
     Route::get('/shipments', [App\Http\Controllers\ShipmentController::class, 'index'])->name('shipments.index');
