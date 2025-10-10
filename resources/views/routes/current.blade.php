@@ -248,12 +248,41 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Modo de Precio -->
+                                    <div class="mb-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                        <label class="block text-xs font-medium text-green-800 mb-2">💰 Modo de Precio</label>
+                                        <div class="flex space-x-4">
+                                            <label class="flex items-center">
+                                                <input type="radio" name="priceMode" value="calculated" class="box-price-mode text-green-600 focus:ring-green-500" checked>
+                                                <span class="ml-2 text-xs text-green-700">
+                                                    <strong>Calculado</strong>
+                                                </span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="priceMode" value="manual" class="box-price-mode text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-xs text-blue-700">
+                                                    <strong>Manual</strong>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Precio por caja</label>
-                                            <div class="box-price px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">
-                                                $0.00 USD
+                                            <!-- Precio calculado (solo lectura) -->
+                                            <div class="box-price-calculated px-3 py-2 bg-green-100 border border-green-300 rounded-md text-sm text-green-800 font-semibold">
+                                                $0.00 USD (Auto)
                                             </div>
+                                            <!-- Precio manual (editable) -->
+                                            <input 
+                                                type="number" 
+                                                class="box-price-manual w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm hidden"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                min="0"
+                                            >
+                                            <div class="box-price-mode-info mt-1 text-xs text-gray-600"></div>
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Volumen</label>
@@ -664,6 +693,8 @@
             const heightInput = boxDiv.querySelector('.box-height');
             const weightLbsInput = boxDiv.querySelector('.box-weight-lbs');
             const weightRateInput = boxDiv.querySelector('.box-weight-rate');
+            const priceModeInputs = boxDiv.querySelectorAll('.box-price-mode');
+            const manualPriceInput = boxDiv.querySelector('.box-price-manual');
             
             // Event listeners para dimensiones
             [lengthInput, widthInput, heightInput].forEach(input => {
@@ -673,6 +704,17 @@
             // Event listeners para peso
             [weightLbsInput, weightRateInput].forEach(input => {
                 input.addEventListener('input', () => calculateBoxPrice(boxDiv));
+            });
+            
+            // Event listeners para modo de precio
+            priceModeInputs.forEach(input => {
+                input.addEventListener('change', () => togglePriceMode(boxDiv));
+            });
+            
+            // Event listener para precio manual
+            manualPriceInput.addEventListener('input', () => {
+                updateBoxPrice(boxDiv);
+                calculateTotalPrice();
             });
         }
 
@@ -696,7 +738,18 @@
                     const weight = parseFloat(boxDiv.querySelector('.box-weight-lbs').value) || 0;
                     const rate = parseFloat(boxDiv.querySelector('.box-weight-rate').value) || 0;
                     price = weight * rate;
-                    boxDiv.querySelector('.box-price').textContent = price > 0 ? `$${price.toFixed(2)} USD` : 'Por peso';
+                    
+                    // Actualizar el precio calculado
+                    const calculatedPriceDiv = boxDiv.querySelector('.box-price-calculated');
+                    if (calculatedPriceDiv) {
+                        calculatedPriceDiv.textContent = price > 0 ? `$${price.toFixed(2)} USD (Auto)` : 'Por peso';
+                    }
+                    
+                    // Si está en modo calculado, actualizar el precio de la caja
+                    const priceMode = boxDiv.querySelector('input[name="priceMode"]:checked').value;
+                    if (priceMode === 'calculated') {
+                        updateBoxPrice(boxDiv, price);
+                    }
                 } else {
                     // Modo volumétrico
                     weightSection.classList.add('hidden');
@@ -735,7 +788,18 @@
                     }
                     
                     price = Math.round(price);
-                    boxDiv.querySelector('.box-price').textContent = `$${price} USD`;
+                    
+                    // Actualizar el precio calculado
+                    const calculatedPriceDiv = boxDiv.querySelector('.box-price-calculated');
+                    if (calculatedPriceDiv) {
+                        calculatedPriceDiv.textContent = `$${price} USD (Auto)`;
+                    }
+                    
+                    // Si está en modo calculado, actualizar el precio de la caja
+                    const priceMode = boxDiv.querySelector('input[name="priceMode"]:checked').value;
+                    if (priceMode === 'calculated') {
+                        updateBoxPrice(boxDiv, price);
+                    }
                 }
                 
                 // Guardar datos de la caja
@@ -770,8 +834,97 @@
             document.getElementById('totalBoxes').textContent = totalBoxes;
         }
 
+        function togglePriceMode(boxDiv) {
+            const priceMode = boxDiv.querySelector('input[name="priceMode"]:checked').value;
+            const calculatedDiv = boxDiv.querySelector('.box-price-calculated');
+            const manualInput = boxDiv.querySelector('.box-price-manual');
+            const infoDiv = boxDiv.querySelector('.box-price-mode-info');
+            
+            if (priceMode === 'calculated') {
+                // Mostrar precio calculado, ocultar manual
+                calculatedDiv.classList.remove('hidden');
+                manualInput.classList.add('hidden');
+                
+                // Obtener precio calculado y aplicarlo
+                const calculatedPrice = calculatedDiv.textContent.match(/\$(\d+\.?\d*)/);
+                if (calculatedPrice) {
+                    const price = parseFloat(calculatedPrice[1]);
+                    // Actualizar el precio calculado en el array de cajas
+                    const boxId = parseInt(boxDiv.getAttribute('data-box-id'));
+                    const boxIndex = boxes.findIndex(box => box.id === boxId);
+                    if (boxIndex >= 0) {
+                        boxes[boxIndex].calculatedPrice = price;
+                    }
+                    updateBoxPrice(boxDiv, price);
+                    infoDiv.textContent = '✅ Usando precio calculado automáticamente';
+                    infoDiv.className = 'mt-1 text-xs text-green-600';
+                }
+            } else {
+                // Mostrar campo manual, ocultar calculado
+                calculatedDiv.classList.add('hidden');
+                manualInput.classList.remove('hidden');
+                
+                // Inicializar con precio calculado actual
+                const calculatedPrice = calculatedDiv.textContent.match(/\$(\d+\.?\d*)/);
+                if (calculatedPrice && !manualInput.value) {
+                    manualInput.value = calculatedPrice[1];
+                    const price = parseFloat(calculatedPrice[1]);
+                    // Actualizar el precio calculado en el array de cajas
+                    const boxId = parseInt(boxDiv.getAttribute('data-box-id'));
+                    const boxIndex = boxes.findIndex(box => box.id === boxId);
+                    if (boxIndex >= 0) {
+                        boxes[boxIndex].calculatedPrice = price;
+                    }
+                    updateBoxPrice(boxDiv, price);
+                }
+                
+                infoDiv.textContent = '✏️ Precio manual - puedes editarlo libremente';
+                infoDiv.className = 'mt-1 text-xs text-blue-600';
+                
+                // Enfocar el campo manual
+                manualInput.focus();
+            }
+            
+            calculateTotalPrice();
+        }
+        
+        function updateBoxPrice(boxDiv, price) {
+            const boxId = parseInt(boxDiv.getAttribute('data-box-id'));
+            const boxIndex = boxes.findIndex(box => box.id === boxId);
+            
+            if (boxIndex >= 0) {
+                // Determinar el precio final según el modo seleccionado
+                const priceMode = boxDiv.querySelector('input[name="priceMode"]:checked').value;
+                
+                if (priceMode === 'manual') {
+                    // Usar el precio manual ingresado
+                    const manualPriceInput = boxDiv.querySelector('.box-price-manual');
+                    const manualPrice = parseFloat(manualPriceInput.value) || 0;
+                    boxes[boxIndex].price = manualPrice;
+                } else {
+                    // Usar el precio calculado
+                    boxes[boxIndex].price = price || 0;
+                }
+                
+                // Guardar información adicional sobre el modo de precio
+                boxes[boxIndex].priceMode = priceMode;
+                boxes[boxIndex].calculatedPrice = price || 0;
+                if (priceMode === 'manual') {
+                    boxes[boxIndex].manualPrice = parseFloat(boxDiv.querySelector('.box-price-manual').value) || 0;
+                }
+            }
+        }
+        
         function calculateTotalPrice() {
-            // Sumar precios de todas las cajas
+            // Recalcular precios de todas las cajas para asegurar que estén actualizados
+            boxes.forEach((box, index) => {
+                const boxDiv = document.querySelector(`[data-box-id="${box.id}"]`);
+                if (boxDiv) {
+                    updateBoxPrice(boxDiv, box.calculatedPrice || 0);
+                }
+            });
+            
+            // Sumar precios de todas las cajas (ahora actualizados)
             const totalBoxPrice = boxes.reduce((sum, box) => sum + (box.price || 0), 0);
             
             // Costo de transporte por caja
@@ -839,10 +992,32 @@
                 }
             }
 
+            // Asegurar que todos los precios estén actualizados antes de enviar
+            boxes.forEach((box, index) => {
+                const boxDiv = document.querySelector(`[data-box-id="${box.id}"]`);
+                if (boxDiv) {
+                    updateBoxPrice(boxDiv, box.calculatedPrice || 0);
+                }
+            });
+            
+            // Recalcular el total final
+            calculateTotalPrice();
+            
             // Recopilar datos del formulario
             const formData = {
                 client: selectedClient,
-                boxes: boxes,
+                boxes: boxes.map(box => ({
+                    id: box.id,
+                    length: box.length,
+                    width: box.width,
+                    height: box.height,
+                    cubicFeet: box.cubicFeet,
+                    price: box.price, // Este será el precio final (calculado o manual)
+                    priceMode: box.priceMode,
+                    calculatedPrice: box.calculatedPrice,
+                    manualPrice: box.manualPrice || null,
+                    weight: box.weight || null
+                })),
                 recipient: {
                     name: document.getElementById('recipientName').value,
                     age: document.getElementById('recipientAge').value,
@@ -851,7 +1026,7 @@
                     city: document.getElementById('recipientCity').value,
                     address: document.getElementById('recipientAddress').value
                 },
-                price_total_usd: document.getElementById('finalPrice').value,
+                price_total_usd: document.getElementById('finalPrice').value, // Total final (cajas + transporte)
                 transport: {
                     enabled: document.getElementById('transportCost').checked,
                     amount_per_box: document.getElementById('transportCost').checked ? (parseFloat(document.getElementById('transportAmount').value) || 0) : 0,

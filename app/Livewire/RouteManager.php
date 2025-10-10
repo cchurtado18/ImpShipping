@@ -107,27 +107,54 @@ class RouteManager extends Component
         session()->flash('success', 'Route deactivated successfully!');
     }
 
+    public function editRoute(Route $route)
+    {
+        $this->month = $route->month;
+        $this->responsible = $route->responsible;
+        $this->route_start_date = $route->route_start_date ? $route->route_start_date->format('Y-m-d') : '';
+        $this->route_end_date = $route->route_end_date ? $route->route_end_date->format('Y-m-d') : '';
+        $this->selectedStates = $route->states ?? [];
+        $this->showCreateModal = true;
+    }
+
     public function deleteRoute(Route $route)
     {
-        // Verificar si la ruta tiene envíos asociados
-        if ($route->shipments()->count() > 0) {
-            session()->flash('error', 'Cannot delete route with associated shipments. Please remove shipments first.');
-            return;
-        }
+        try {
+            // Verificar si la ruta tiene envíos asociados
+            $shipmentsCount = $route->shipments()->count();
+            if ($shipmentsCount > 0) {
+                session()->flash('error', "Cannot delete route '{$route->month}' because it has {$shipmentsCount} associated shipment(s). Please remove shipments first.");
+                return;
+            }
 
-        // Verificar si la ruta tiene gastos asociados
-        if ($route->routeExpenses()->count() > 0) {
-            session()->flash('error', 'Cannot delete route with associated expenses. Please remove expenses first.');
-            return;
-        }
+            // Verificar si la ruta tiene gastos asociados
+            $expensesCount = $route->routeExpenses()->count();
+            if ($expensesCount > 0) {
+                session()->flash('error', "Cannot delete route '{$route->month}' because it has {$expensesCount} associated expense(s). Please remove expenses first.");
+                return;
+            }
 
-        $route->delete();
-        session()->flash('success', 'Route deleted successfully!');
+            $routeName = $route->month . ' - ' . $route->responsible;
+            $route->delete();
+            session()->flash('success', "Route '{$routeName}' deleted successfully!");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting route: ' . $e->getMessage());
+        }
     }
 
     public function viewRouteClients(Route $route)
     {
         return redirect()->route('routes.clients', $route);
+    }
+
+    public function viewRouteExpenses(Route $route)
+    {
+        return redirect()->route('routes.expenses', $route);
+    }
+
+    public function viewRouteReports(Route $route)
+    {
+        return redirect()->route('routes.reports', $route);
     }
 
     private function resetForm()

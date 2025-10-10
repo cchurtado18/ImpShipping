@@ -33,6 +33,19 @@ class ShipmentFormModal extends Component
     public $shipmentStatus = 'por_recepcionar';
     public $notes = '';
     
+    // Dimensiones personalizadas
+    public $customDimensions = false;
+    public $boxLength = 0;
+    public $boxWidth = 0;
+    public $boxHeight = 0;
+    public $boxWeight = 0;
+    public $boxWeightRate = 0;
+    public $calculatedPrice = 0;
+    
+    // Modo de precio
+    public $useCalculatedPrice = true;
+    public $manualPrice = 0;
+    
     protected $listeners = ['clientSelected', 'openShipmentModal'];
     
     public function mount($route = null)
@@ -91,19 +104,112 @@ class ShipmentFormModal extends Component
             $box = Box::find($this->selectedBox);
             if ($box) {
                 $this->finalPrice = $box->base_price_usd;
+                $this->calculatedPrice = $box->base_price_usd;
+                // Cargar dimensiones de la caja seleccionada
+                $this->boxLength = $box->length_in;
+                $this->boxWidth = $box->width_in;
+                $this->boxHeight = $box->height_in;
+            }
+        }
+    }
+    
+    public function updatedCustomDimensions()
+    {
+        if (!$this->customDimensions) {
+            // Resetear dimensiones personalizadas
+            $this->boxLength = 0;
+            $this->boxWidth = 0;
+            $this->boxHeight = 0;
+            $this->boxWeight = 0;
+            $this->boxWeightRate = 0;
+            $this->calculatedPrice = 0;
+            $this->finalPrice = 0;
+        }
+    }
+    
+    public function calculatePrice()
+    {
+        if ($this->boxLength > 0 && $this->boxWidth > 0 && $this->boxHeight > 0) {
+            $cubicInches = $this->boxLength * $this->boxWidth * $this->boxHeight;
+            $cubicFeet = $cubicInches / 1728;
+            
+            $price = 0;
+            
+            if ($cubicFeet >= 0.1 && $cubicFeet <= 2.99) {
+                // Modo por peso
+                if ($this->boxWeight > 0 && $this->boxWeightRate > 0) {
+                    $price = $this->boxWeight * $this->boxWeightRate;
+                }
+            } else {
+                // Modo volumétrico - aplicar la misma fórmula que en current.blade.php
+                if ($cubicFeet >= 2.90 && $cubicFeet <= 3.89) {
+                    $price = $cubicFeet * 55.52;
+                } else if ($cubicFeet >= 3.90 && $cubicFeet <= 4.89) {
+                    $price = $cubicFeet * 51.52;
+                } else if ($cubicFeet >= 4.90 && $cubicFeet <= 5.89) {
+                    $price = $cubicFeet * 49.02;
+                } else if ($cubicFeet >= 5.90 && $cubicFeet <= 6.89) {
+                    $price = $cubicFeet * 45.52;
+                } else if ($cubicFeet >= 6.90 && $cubicFeet <= 7.89) {
+                    $price = $cubicFeet * 41.52;
+                } else if ($cubicFeet >= 7.90 && $cubicFeet <= 8.89) {
+                    $price = $cubicFeet * 35.75;
+                } else if ($cubicFeet >= 8.90 && $cubicFeet <= 9.89) {
+                    $price = $cubicFeet * 34.75;
+                } else if ($cubicFeet >= 9.90 && $cubicFeet <= 10.89) {
+                    $price = $cubicFeet * 33.25;
+                } else if ($cubicFeet >= 10.90 && $cubicFeet <= 11.89) {
+                    $price = $cubicFeet * 32.75;
+                } else if ($cubicFeet >= 11.90 && $cubicFeet <= 12.89) {
+                    $price = $cubicFeet * 31.75;
+                } else if ($cubicFeet >= 12.90 && $cubicFeet <= 13.89) {
+                    $price = $cubicFeet * 30.25;
+                } else if ($cubicFeet >= 13.90 && $cubicFeet <= 14.89) {
+                    $price = $cubicFeet * 29.25;
+                } else if ($cubicFeet >= 14.90 && $cubicFeet <= 16.99) {
+                    $price = $cubicFeet * 28.25;
+                } else if ($cubicFeet >= 17 && $cubicFeet <= 19.99) {
+                    $price = $cubicFeet * 27.75;
+                } else if ($cubicFeet >= 20) {
+                    $price = $cubicFeet * 25.75;
+                }
+                
+                $price = round($price);
+            }
+            
+            $this->calculatedPrice = $price;
+            
+            // Solo actualizar finalPrice si estamos usando precio calculado
+            if ($this->useCalculatedPrice) {
+                $this->finalPrice = $price;
             }
         }
     }
     
     public function showPreview()
     {
-        $this->validate([
+        $rules = [
             'selectedClient' => 'required',
             'selectedRecipient' => 'required',
-            'selectedBox' => 'required',
-            'finalPrice' => 'required|numeric|min:0',
             'shipmentStatus' => 'required',
-        ]);
+        ];
+        
+        // Validar precio según el modo seleccionado
+        if ($this->customDimensions && $this->calculatedPrice > 0 && !$this->useCalculatedPrice) {
+            $rules['manualPrice'] = 'required|numeric|min:0';
+        } else {
+            $rules['finalPrice'] = 'required|numeric|min:0';
+        }
+        
+        if (!$this->customDimensions) {
+            $rules['selectedBox'] = 'required';
+        } else {
+            $rules['boxLength'] = 'required|numeric|min:0.1';
+            $rules['boxWidth'] = 'required|numeric|min:0.1';
+            $rules['boxHeight'] = 'required|numeric|min:0.1';
+        }
+        
+        $this->validate($rules);
         
         $this->showPreview = true;
     }
@@ -115,24 +221,58 @@ class ShipmentFormModal extends Component
     
     public function saveShipment()
     {
-        $this->validate([
+        $rules = [
             'selectedClient' => 'required',
             'selectedRecipient' => 'required',
-            'selectedBox' => 'required',
-            'finalPrice' => 'required|numeric|min:0',
             'shipmentStatus' => 'required',
-        ]);
+        ];
+        
+        // Validar precio según el modo seleccionado
+        if ($this->customDimensions && $this->calculatedPrice > 0 && !$this->useCalculatedPrice) {
+            $rules['manualPrice'] = 'required|numeric|min:0';
+        } else {
+            $rules['finalPrice'] = 'required|numeric|min:0';
+        }
+        
+        if (!$this->customDimensions) {
+            $rules['selectedBox'] = 'required';
+        } else {
+            $rules['boxLength'] = 'required|numeric|min:0.1';
+            $rules['boxWidth'] = 'required|numeric|min:0.1';
+            $rules['boxHeight'] = 'required|numeric|min:0.1';
+        }
+        
+        $this->validate($rules);
+        
+        // Determinar el precio final a guardar
+        $finalPriceToSave = $this->finalPrice;
+        if ($this->customDimensions && $this->calculatedPrice > 0 && !$this->useCalculatedPrice) {
+            $finalPriceToSave = $this->manualPrice;
+        }
         
         // Crear o actualizar envío
         $shipmentData = [
             'client_id' => $this->selectedClient,
             'recipient_id' => $this->selectedRecipient,
             'route_id' => $this->route->id,
-            'box_id' => $this->selectedBox,
-            'sale_price_usd' => $this->finalPrice,
+            'box_id' => $this->customDimensions ? null : $this->selectedBox,
+            'sale_price_usd' => $finalPriceToSave,
             'notes' => $this->notes,
             'shipment_status' => $this->shipmentStatus,
         ];
+        
+        // Si son dimensiones personalizadas, guardar en notes
+        if ($this->customDimensions) {
+            $dimensionsNote = "Custom Dimensions: {$this->boxLength}\" × {$this->boxWidth}\" × {$this->boxHeight}\"";
+            if ($this->boxWeight > 0 && $this->boxWeightRate > 0) {
+                $dimensionsNote .= " | Weight: {$this->boxWeight} lbs @ ${$this->boxWeightRate}/lb";
+            }
+            
+            $priceMode = $this->useCalculatedPrice ? "Calculated Price" : "Manual Price";
+            $dimensionsNote .= " | Calculated: ${$this->calculatedPrice} | {$priceMode}: ${$finalPriceToSave}";
+            
+            $shipmentData['notes'] = $this->notes ? $this->notes . "\n" . $dimensionsNote : $dimensionsNote;
+        }
         
         if ($this->editingShipment) {
             $this->editingShipment->update($shipmentData);
@@ -166,6 +306,58 @@ class ShipmentFormModal extends Component
         $this->shipmentStatus = 'por_recepcionar';
         $this->notes = '';
         $this->recipients = [];
+        $this->customDimensions = false;
+        $this->boxLength = 0;
+        $this->boxWidth = 0;
+        $this->boxHeight = 0;
+        $this->boxWeight = 0;
+        $this->boxWeightRate = 0;
+        $this->calculatedPrice = 0;
+        $this->useCalculatedPrice = true;
+        $this->manualPrice = 0;
+    }
+    
+    public function updatedBoxLength()
+    {
+        $this->calculatePrice();
+    }
+    
+    public function updatedBoxWidth()
+    {
+        $this->calculatePrice();
+    }
+    
+    public function updatedBoxHeight()
+    {
+        $this->calculatePrice();
+    }
+    
+    public function updatedBoxWeight()
+    {
+        $this->calculatePrice();
+    }
+    
+    public function updatedBoxWeightRate()
+    {
+        $this->calculatePrice();
+    }
+    
+    public function updatedUseCalculatedPrice()
+    {
+        if ($this->useCalculatedPrice) {
+            // Cambiar a precio calculado
+            $this->finalPrice = $this->calculatedPrice;
+        } else {
+            // Cambiar a precio manual
+            $this->manualPrice = $this->finalPrice;
+        }
+    }
+    
+    public function updatedManualPrice()
+    {
+        if (!$this->useCalculatedPrice) {
+            $this->finalPrice = $this->manualPrice;
+        }
     }
     
     public function getSelectedClientProperty()

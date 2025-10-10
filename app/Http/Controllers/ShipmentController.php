@@ -22,6 +22,8 @@ class ShipmentController extends Controller
                 'boxes.*.length' => 'required|numeric|min:0.1',
                 'boxes.*.width' => 'required|numeric|min:0.1',
                 'boxes.*.height' => 'required|numeric|min:0.1',
+                'boxes.*.price' => 'required|numeric|min:0',
+                'boxes.*.priceMode' => 'required|in:calculated,manual',
                 'recipient.name' => 'required|string|max:255',
                 'recipient.phone' => 'required|string|max:20',
                 'recipient.department' => 'required|string|max:100',
@@ -66,8 +68,8 @@ class ShipmentController extends Controller
                 $cubicFeet = ($boxData['length'] * $boxData['width'] * $boxData['height']) / 1728;
                 $box = $this->findClosestBox($cubicFeet);
                 
-                // Calcular precio individual de la caja
-                $boxPrice = $this->calculateBoxPrice($cubicFeet, $boxData);
+                // Usar el precio que viene del frontend (ya sea calculado o manual)
+                $boxPrice = $boxData['price'] ?? 0;
                 
                 // Agregar costo de transporte si está habilitado
                 $transportCost = $request->input('transport.enabled') ? 
@@ -85,7 +87,10 @@ class ShipmentController extends Controller
                     'sale_price_usd' => $totalPrice,
                     'declared_value' => 0,
                     'notes' => $request->input('notes') . "\nDimensiones: {$boxData['length']}\" × {$boxData['width']}\" × {$boxData['height']}\" ({$cubicFeet} ft³)" . 
-                               ($boxData['weight'] ? "\nPeso: {$boxData['weight']['lbs']} lb × \${$boxData['weight']['rate']}/lb" : ''),
+                               ($boxData['weight'] ? "\nPeso: {$boxData['weight']['lbs']} lb × \${$boxData['weight']['rate']}/lb" : '') .
+                               "\nPrecio: \${$boxPrice} USD (" . ($boxData['priceMode'] ?? 'calculado') . ")" .
+                               ($boxData['priceMode'] === 'manual' && isset($boxData['calculatedPrice']) ? 
+                                   "\nPrecio calculado: \${$boxData['calculatedPrice']} USD" : ''),
                 ]);
 
                 $shipments[] = $shipment;

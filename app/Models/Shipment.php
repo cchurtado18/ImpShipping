@@ -26,12 +26,21 @@ class Shipment extends Model
         'declared_value',
         'notes',
         'invoiced',
+        'reception_status',
+        'received_at',
+        'loaded_at',
+        'reception_photo_path',
+        'reception_notes',
+        'received_by',
+        'loaded_by',
     ];
 
     protected $casts = [
         'sale_price_usd' => 'decimal:2',
         'declared_value' => 'decimal:2',
         'invoiced' => 'boolean',
+        'received_at' => 'datetime',
+        'loaded_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -135,6 +144,69 @@ class Shipment extends Model
             'entregado' => 'bg-green-100 text-green-800',
             'cancelled' => 'bg-red-100 text-red-800',
             default => 'bg-gray-100 text-gray-800'
+        };
+    }
+
+    // Relaciones para recepción
+    public function receivedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'received_by');
+    }
+
+    public function loadedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'loaded_by');
+    }
+
+    // Métodos para estado de recepción
+    public function getReceptionStatusLabelAttribute(): string
+    {
+        return match($this->reception_status) {
+            'pending' => 'Pendiente',
+            'received' => 'Recepcionado',
+            'loaded' => 'Cargado',
+            'in_transit' => 'En Tránsito',
+            'delivered' => 'Entregado',
+            default => ucfirst($this->reception_status)
+        };
+    }
+
+    public function getReceptionStatusColorAttribute(): string
+    {
+        return match($this->reception_status) {
+            'pending' => 'bg-gray-100 text-gray-800',
+            'received' => 'bg-blue-100 text-blue-800',
+            'loaded' => 'bg-yellow-100 text-yellow-800',
+            'in_transit' => 'bg-purple-100 text-purple-800',
+            'delivered' => 'bg-green-100 text-green-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
+    }
+
+    public function isReceived(): bool
+    {
+        return $this->reception_status === 'received';
+    }
+
+    public function isLoaded(): bool
+    {
+        return $this->reception_status === 'loaded';
+    }
+
+    public function canBeLoaded(): bool
+    {
+        return $this->reception_status === 'received' && !empty($this->reception_photo_path);
+    }
+
+    public function getAvailableReceptionStatuses(): array
+    {
+        return match($this->reception_status) {
+            'pending' => ['received'],
+            'received' => ['loaded'],
+            'loaded' => ['in_transit'],
+            'in_transit' => ['delivered'],
+            'delivered' => [],
+            default => ['received']
         };
     }
 

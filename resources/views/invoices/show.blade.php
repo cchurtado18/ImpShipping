@@ -45,10 +45,7 @@
                         <div class="text-sm text-gray-600 space-y-1">
                             <p><strong>Phone:</strong> +1 (305) 890-4018</p>
                             <p><strong>Email:</strong> <a href="mailto:imperioshipping@usa.com" class="text-blue-600 underline">imperioshipping@usa.com</a></p>
-                            <p><strong>Address:</strong></p>
-                            <p>Residencial Vistas de</p>
-                            <p>Equípela, casa A3-11</p>
-                            <p>Esquipulas, Managua</p>
+                            <p><strong>Address:</strong> 8551 NW 72nd St Miami, FL 33166</p>
                         </div>
                     </div>
                     <div class="text-right">
@@ -102,12 +99,36 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="border border-gray-300 px-4 py-3">{{ $invoice->service_description }}</td>
-                                <td class="border border-gray-300 px-4 py-3 text-center">{{ $invoice->quantity }}</td>
-                                <td class="border border-gray-300 px-4 py-3 text-center">${{ number_format($invoice->unit_price, 2) }}</td>
-                                <td class="border border-gray-300 px-4 py-3 text-center">${{ number_format($invoice->subtotal, 2) }}</td>
-                            </tr>
+                            @if($shipments->count() > 1)
+                                {{-- Múltiples paquetes - una fila por paquete --}}
+                                @foreach($shipments as $shipment)
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-3">
+                                            <div class="font-medium">{{ $shipment->code }}</div>
+                                            <div class="text-sm text-gray-600">
+                                                @if($shipment->box)
+                                                    Dimensiones: {{ $shipment->box->length_in }}" × {{ $shipment->box->width_in }}" × {{ $shipment->box->height_in }}"
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-3 text-center">1</td>
+                                        <td class="border border-gray-300 px-4 py-3 text-center">
+                                            ${{ number_format($shipment->sale_price_usd ?? $shipment->box->base_price_usd ?? 0, 2) }}
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-3 text-center">
+                                            ${{ number_format($shipment->sale_price_usd ?? $shipment->box->base_price_usd ?? 0, 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                {{-- Un solo paquete - mostrar descripción completa --}}
+                                <tr>
+                                    <td class="border border-gray-300 px-4 py-3">{{ $invoice->service_description }}</td>
+                                    <td class="border border-gray-300 px-4 py-3 text-center">{{ $invoice->quantity }}</td>
+                                    <td class="border border-gray-300 px-4 py-3 text-center">${{ number_format($invoice->unit_price, 2) }}</td>
+                                    <td class="border border-gray-300 px-4 py-3 text-center">${{ number_format($invoice->subtotal, 2) }}</td>
+                                </tr>
+                            @endif
                             @if($invoice->tax_amount > 0)
                             <tr>
                                 <td class="border border-gray-300 px-4 py-3" colspan="3">Impuesto</td>

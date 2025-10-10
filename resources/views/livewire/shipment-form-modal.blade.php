@@ -1,7 +1,7 @@
 <div>
     @if($showModal)
     <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" id="shipment-modal">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" style="width: 384px; max-width: 384px;">
+        <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-4">
@@ -46,7 +46,16 @@
                         @error('selectedRecipient') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
-                    <!-- Caja -->
+                    <!-- Opción de dimensiones -->
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" wire:model="customDimensions" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <span class="ml-2 text-sm font-medium text-gray-700">Use Custom Dimensions</span>
+                        </label>
+                    </div>
+
+                    @if(!$customDimensions)
+                    <!-- Caja Predefinida -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Box Type *</label>
                         <select 
@@ -60,18 +69,151 @@
                         </select>
                         @error('selectedBox') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
+                    @else
+                    <!-- Dimensiones Personalizadas -->
+                    <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h4 class="text-sm font-semibold text-blue-800 mb-3">📏 Custom Box Dimensions</h4>
+                        
+                        <div class="grid grid-cols-3 gap-3 mb-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Length (in)</label>
+                                <input 
+                                    type="number" 
+                                    wire:model="boxLength"
+                                    step="0.1"
+                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="0.0"
+                                >
+                                @error('boxLength') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Width (in)</label>
+                                <input 
+                                    type="number" 
+                                    wire:model="boxWidth"
+                                    step="0.1"
+                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="0.0"
+                                >
+                                @error('boxWidth') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Height (in)</label>
+                                <input 
+                                    type="number" 
+                                    wire:model="boxHeight"
+                                    step="0.1"
+                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="0.0"
+                                >
+                                @error('boxHeight') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        
+                        <!-- Información de cálculo -->
+                        @if($boxLength > 0 && $boxWidth > 0 && $boxHeight > 0)
+                            @php
+                                $cubicFeet = ($boxLength * $boxWidth * $boxHeight) / 1728;
+                            @endphp
+                            <div class="text-xs text-blue-700 mb-3">
+                                <strong>Volume:</strong> {{ number_format($cubicFeet, 2) }} ft³
+                                @if($cubicFeet <= 2.99)
+                                    <span class="text-orange-600">(Weight-based pricing)</span>
+                                @else
+                                    <span class="text-green-600">(Volume-based pricing)</span>
+                                @endif
+                            </div>
+                            
+                            @if($cubicFeet <= 2.99)
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Weight (lbs)</label>
+                                    <input 
+                                        type="number" 
+                                        wire:model="boxWeight"
+                                        step="0.1"
+                                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Rate ($/lb)</label>
+                                    <input 
+                                        type="number" 
+                                        wire:model="boxWeightRate"
+                                        step="0.01"
+                                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.00"
+                                    >
+                                </div>
+                            </div>
+                            @endif
+                        @endif
+                    </div>
+                    @endif
+
+                    <!-- Modo de Precio -->
+                    @if($customDimensions && $calculatedPrice > 0)
+                    <div class="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                        <label class="block text-sm font-medium text-green-800 mb-2">💰 Price Mode</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" wire:model="useCalculatedPrice" value="true" class="text-green-600 focus:ring-green-500">
+                                <span class="ml-2 text-sm text-green-700">
+                                    <strong>Calculated Price</strong> - ${{ number_format($calculatedPrice, 2) }}
+                                </span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" wire:model="useCalculatedPrice" value="false" class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-blue-700">
+                                    <strong>Manual Price</strong> - Set your own amount
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Precio -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Final Price (USD) *</label>
-                        <input 
-                            type="number" 
-                            wire:model="finalPrice"
-                            step="0.01"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="0.00"
-                        >
+                        
+                        @if($customDimensions && $calculatedPrice > 0 && $useCalculatedPrice)
+                            <!-- Mostrar precio calculado (solo lectura) -->
+                            <div class="w-full px-3 py-2 border border-green-300 bg-green-50 rounded-md text-green-800 font-semibold">
+                                ${{ number_format($calculatedPrice, 2) }} (Auto-calculated)
+                            </div>
+                            <div class="mt-1 text-xs text-green-600">
+                                ✅ Using calculated price based on dimensions
+                            </div>
+                        @else
+                            <!-- Campo editable para precio manual -->
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    @if($customDimensions && $calculatedPrice > 0)
+                                        wire:model="manualPrice"
+                                    @else
+                                        wire:model="finalPrice"
+                                    @endif
+                                    step="0.01"
+                                    class="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0.00"
+                                >
+                                @if($customDimensions && $calculatedPrice > 0)
+                                    <div class="absolute right-2 top-2 text-xs text-blue-500">
+                                        Manual
+                                    </div>
+                                @endif
+                            </div>
+                            @if($customDimensions && $calculatedPrice > 0)
+                                <div class="mt-1 text-xs text-blue-600">
+                                    💡 Manual override - Calculated was ${{ number_format($calculatedPrice, 2) }}
+                                </div>
+                            @endif
+                        @endif
+                        
                         @error('finalPrice') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        @error('manualPrice') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Estado -->
@@ -184,12 +326,37 @@
                     <!-- Información de la Caja -->
                     <div class="bg-yellow-50 p-4 rounded-lg">
                         <h4 class="text-lg font-semibold text-yellow-800 mb-3">📦 Box Information</h4>
-                        @if($this->selectedBox)
+                        @if($customDimensions)
                             <div class="space-y-2 text-sm">
+                                <p><strong>Type:</strong> Custom Dimensions</p>
+                                <p><strong>Dimensions:</strong> {{ $boxLength }}" × {{ $boxWidth }}" × {{ $boxHeight }}"</p>
+                                @if($boxLength > 0 && $boxWidth > 0 && $boxHeight > 0)
+                                    @php
+                                        $cubicFeet = ($boxLength * $boxWidth * $boxHeight) / 1728;
+                                    @endphp
+                                    <p><strong>Volume:</strong> {{ number_format($cubicFeet, 2) }} ft³</p>
+                                @endif
+                                @if($boxWeight > 0 && $boxWeightRate > 0)
+                                    <p><strong>Weight:</strong> {{ $boxWeight }} lbs @ ${{ number_format($boxWeightRate, 2) }}/lb</p>
+                                @endif
+                                <p><strong>Calculated Price:</strong> ${{ number_format($calculatedPrice, 2) }}</p>
+                                <p class="text-blue-600">
+                                    <strong>Price Mode:</strong> 
+                                    @if($useCalculatedPrice)
+                                        <span class="text-green-600">✅ Calculated Price</span> - ${{ number_format($calculatedPrice, 2) }}
+                                    @else
+                                        <span class="text-blue-600">✏️ Manual Price</span> - ${{ number_format($manualPrice, 2) }}
+                                    @endif
+                                </p>
+                            </div>
+                        @elseif($this->selectedBox)
+                            <div class="space-y-2 text-sm">
+                                <p><strong>Type:</strong> Predefined Box</p>
                                 <p><strong>Code:</strong> {{ $this->selectedBox->code }}</p>
                                 <p><strong>Dimensions:</strong> {{ $this->selectedBox->length_in }}" × {{ $this->selectedBox->width_in }}" × {{ $this->selectedBox->height_in }}"</p>
                                 <p><strong>Volume:</strong> {{ number_format(($this->selectedBox->length_in * $this->selectedBox->width_in * $this->selectedBox->height_in) / 1728, 2) }} ft³</p>
                                 <p><strong>Base Price:</strong> ${{ number_format($this->selectedBox->base_price_usd, 2) }}</p>
+                                <p><strong>Final Price:</strong> ${{ number_format($finalPrice, 2) }}</p>
                             </div>
                         @else
                             <p class="text-red-500">No box selected</p>
@@ -242,7 +409,17 @@
                         </div>
                         <div class="text-center">
                             <p class="text-gray-600">Precio Total</p>
-                            <p class="font-bold text-lg text-green-600">${{ number_format($finalPrice, 2) }}</p>
+                            @if($customDimensions && $calculatedPrice > 0)
+                                @if($useCalculatedPrice)
+                                    <p class="font-bold text-lg text-green-600">${{ number_format($calculatedPrice, 2) }}</p>
+                                    <p class="text-xs text-green-600">✅ Calculated</p>
+                                @else
+                                    <p class="font-bold text-lg text-blue-600">${{ number_format($manualPrice, 2) }}</p>
+                                    <p class="text-xs text-blue-600">✏️ Manual</p>
+                                @endif
+                            @else
+                                <p class="font-bold text-lg text-green-600">${{ number_format($finalPrice, 2) }}</p>
+                            @endif
                         </div>
                     </div>
                 </div>

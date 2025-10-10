@@ -16,27 +16,47 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Select Shipment (Auto-filled if client has pending shipments)</label>
-                <select wire:model.live="selectedShipment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Choose a shipment...</option>
-                    @if($selectedClient && count($availableShipments) > 0)
-                        <optgroup label="Client's Pending Shipments">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Packages (Auto-selected if client has pending shipments)</label>
+                @if($selectedClient && count($availableShipments) > 0)
+                    <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                        <h4 class="text-sm font-medium text-blue-800 mb-3">Available Packages for {{ $client?->full_name ?? 'Selected Client' }}:</h4>
+                        <div class="space-y-2">
                             @foreach($availableShipments as $shipment)
-                                <option value="{{ $shipment->id }}">
-                                    {{ $shipment->code }} - {{ $shipment->recipient?->full_name ?? 'No recipient' }} ({{ $shipment->box?->code ?? 'No box' }})
-                                </option>
+                                <label class="flex items-center space-x-3 p-2 bg-white rounded border {{ in_array($shipment->id, $selectedShipments) ? 'ring-2 ring-blue-500 bg-blue-50' : '' }}">
+                                    <input type="checkbox" 
+                                           {{ in_array($shipment->id, $selectedShipments) ? 'checked' : '' }}
+                                           wire:click="toggleShipmentSelection({{ $shipment->id }})"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $shipment->code }} - {{ $shipment->recipient?->full_name ?? 'No recipient' }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            Box: {{ $shipment->box?->code ?? 'No box' }} | 
+                                            Price: ${{ number_format($shipment->sale_price_usd ?? 0, 2) }}
+                                        </div>
+                                        @if(in_array($shipment->id, $selectedShipments))
+                                            <div class="text-xs text-blue-600 font-medium mt-1">
+                                                ✅ Selected for invoice
+                                            </div>
+                                        @endif
+                                    </div>
+                                </label>
                             @endforeach
-                        </optgroup>
-                    @endif
-                    <optgroup label="All Available Shipments">
-                        @foreach($shipments as $shipment)
-                            <option value="{{ $shipment->id }}">
-                                {{ $shipment->code }} - {{ $shipment->client?->full_name ?? 'No client' }} - {{ $shipment->recipient?->full_name ?? 'No recipient' }}
-                            </option>
-                        @endforeach
-                    </optgroup>
-                </select>
-                @error('selectedShipment') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <p class="text-xs text-blue-600 mt-2">
+                            @if(count($selectedShipments) > 0)
+                                ✅ {{ count($selectedShipments) }} package(s) selected for invoice
+                            @else
+                                📦 Select packages to include in the invoice
+                            @endif
+                        </p>
+                    </div>
+                @else
+                    <div class="text-center py-4 text-gray-500">
+                        <p>No pending packages found for this client</p>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -54,7 +74,7 @@
                             Auto-fill Available!
                         </h3>
                         <div class="mt-2 text-sm text-green-700">
-                            <p>This client has {{ count($availableShipments) }} pending shipment(s). Select one to auto-fill the invoice.</p>
+                            <p>This client has {{ count($availableShipments) }} pending shipment(s). Select the packages you want to invoice.</p>
                         </div>
                     </div>
                 </div>
@@ -81,7 +101,13 @@
 
         <!-- Hidden fields for form submission -->
         <input type="hidden" name="client_id" value="{{ $selectedClient }}">
-        <input type="hidden" name="shipment_id" value="{{ $selectedShipment }}">
+        
+        <!-- Hidden fields for selected shipments -->
+        @if(count($selectedShipments) > 0)
+            @foreach($selectedShipments as $shipmentId)
+                <input type="hidden" name="shipment_ids[]" value="{{ $shipmentId }}">
+            @endforeach
+        @endif
 
         <!-- Sender Information -->
         <div class="border-t pt-6">
@@ -155,6 +181,11 @@
             <!-- Hidden fields for automatic price calculation -->
             <input type="hidden" name="unit_price" value="{{ $unit_price }}">
             <input type="hidden" name="tax_amount" value="{{ $tax_amount }}">
+            
+            <!-- Hidden fields for selected shipments -->
+            @foreach($selectedShipments as $shipmentId)
+                <input type="hidden" name="shipment_ids[]" value="{{ $shipmentId }}">
+            @endforeach
         </div>
 
         <!-- Price Summary - Automatic Calculation -->

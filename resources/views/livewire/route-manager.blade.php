@@ -1,27 +1,38 @@
 <div>
+    <!-- Flash Messages -->
+    @if (session()->has('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Header -->
-    <div class="bg-white shadow-sm rounded-lg mb-6">
-        <div class="p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Route Management</h1>
-                    <p class="mt-1 text-sm text-gray-600">
-                        Manage routes and assign responsible persons
-                    </p>
-                </div>
-                <button wire:click="showCreateForm" 
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Create New Route
-                </button>
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Route Management</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Create and manage routes with responsible persons
+                </p>
             </div>
+            <button wire:click="showCreateForm" 
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Route
+            </button>
         </div>
     </div>
 
     <!-- Routes Table -->
-    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div class="bg-white rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -36,63 +47,88 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($routes as $route)
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {{ $route->month }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {{ $route->responsible_name }}
-                        </span>
+                        <div>
+                            <div class="font-medium text-gray-900">{{ $route->responsible_name }}</div>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span class="text-xs text-gray-600">{{ $route->formatted_states }}</span>
+                        <div>
+                            <div class="text-gray-900">{{ $route->formatted_states }}</div>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div class="text-xs">
-                            <div><strong>Start:</strong> {{ $route->route_start_date ? $route->route_start_date->format('M d, Y') : '-' }}</div>
-                            <div><strong>End:</strong> {{ $route->route_end_date ? $route->route_end_date->format('M d, Y') : '-' }}</div>
+                        <div>
+                            <div class="text-gray-900">{{ $route->route_start_date ? $route->route_start_date->format('M d, Y') : '-' }}</div>
+                            <div class="text-gray-500">{{ $route->route_end_date ? $route->route_end_date->format('M d, Y') : '-' }}</div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex flex-col space-y-1">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($route->status === 'collecting') bg-yellow-100 text-yellow-800
-                                @elseif($route->status === 'closed') bg-green-100 text-green-800
-                                @else bg-gray-100 text-gray-800
-                                @endif">
-                                {{ ucfirst($route->status) }}
-                            </span>
-                            @if($route->is_active)
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                            @endif
-                        </div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {{ ucfirst($route->status) }}
+                        </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <a href="{{ route('routes.current') }}" 
-                           class="text-blue-600 hover:text-blue-900">View</a>
-                        <button wire:click="viewRouteClients({{ $route->id }})" 
-                                class="text-purple-600 hover:text-purple-900">Clients</button>
-                        @if(!$route->is_active && $route->status !== 'closed')
-                            <button wire:click="activateRoute({{ $route->id }})" 
-                                    class="text-green-600 hover:text-green-900">Activate</button>
-                        @elseif($route->is_active)
-                            <button wire:click="deactivateRoute({{ $route->id }})" 
-                                    class="text-orange-600 hover:text-orange-900">Deactivate</button>
-                        @endif
-                        @if($route->status === 'collecting')
-                            <button wire:click="closeRoute({{ $route->id }})" 
-                                    class="text-red-600 hover:text-red-900"
-                                    onclick="return confirm('Are you sure you want to close this route?')">
-                                Close
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex space-x-2">
+                            <!-- View Button -->
+                            <a href="{{ route('routes.current') }}" 
+                               class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-md hover:bg-blue-200">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                View
+                            </a>
+
+                            <!-- Clients Button -->
+                            <button wire:click="viewRouteClients({{ $route->id }})" 
+                                    class="inline-flex items-center px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-md hover:bg-purple-200">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                Clients
                             </button>
-                        @endif
-                        <button wire:click="deleteRoute({{ $route->id }})" 
-                                class="text-red-600 hover:text-red-900"
-                                onclick="return confirm('Are you sure you want to delete this route? This action cannot be undone.')">
-                            Delete
-                        </button>
+
+                            <!-- Expenses Button -->
+                            <button wire:click="viewRouteExpenses({{ $route->id }})" 
+                                    class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-md hover:bg-yellow-200">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                </svg>
+                                Expenses
+                            </button>
+
+                            <!-- Reports Button -->
+                            <button wire:click="viewRouteReports({{ $route->id }})" 
+                                    class="inline-flex items-center px-3 py-1.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-md hover:bg-indigo-200">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Reports
+                            </button>
+
+                            <!-- Edit Button -->
+                            <button wire:click="editRoute({{ $route->id }})" 
+                                    class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 text-xs font-medium rounded-md hover:bg-green-200">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Edit
+                            </button>
+
+                            <!-- Delete Button -->
+                            <button wire:click="deleteRoute({{ $route->id }})" 
+                                    class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 text-xs font-medium rounded-md hover:bg-red-200"
+                                    onclick="return confirm('Are you sure you want to delete this route? This action cannot be undone.')">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Delete
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @empty

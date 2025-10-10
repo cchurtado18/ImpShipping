@@ -21,6 +21,15 @@ class Route extends Model
         'route_end_date',
         'states',
         'is_active',
+        'total_budget',
+        'used_budget',
+        'projected_revenue',
+        'actual_revenue',
+        'projected_shipments',
+        'actual_shipments',
+        'notes',
+        'route_goals',
+        'performance_metrics',
     ];
 
     protected $casts = [
@@ -28,6 +37,12 @@ class Route extends Model
         'route_end_date' => 'date',
         'states' => 'array',
         'is_active' => 'boolean',
+        'total_budget' => 'decimal:2',
+        'used_budget' => 'decimal:2',
+        'projected_revenue' => 'decimal:2',
+        'actual_revenue' => 'decimal:2',
+        'route_goals' => 'array',
+        'performance_metrics' => 'array',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -46,6 +61,11 @@ class Route extends Model
     public function routeExpenses(): HasMany
     {
         return $this->hasMany(RouteExpense::class);
+    }
+
+    public function routeProjections(): HasMany
+    {
+        return $this->hasMany(RouteProjection::class);
     }
 
     public function payments(): HasManyThrough

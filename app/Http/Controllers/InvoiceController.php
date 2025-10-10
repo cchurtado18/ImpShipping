@@ -29,7 +29,8 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'client_id' => 'nullable|exists:clients,id',
-            'shipment_id' => 'nullable|exists:shipments,id',
+            'shipment_ids' => 'nullable|array',
+            'shipment_ids.*' => 'exists:shipments,id',
             'sender_name' => 'required|string|max:255',
             'sender_phone' => 'required|string|max:20',
             'sender_address' => 'required|string',
@@ -72,13 +73,45 @@ class InvoiceController extends Controller
             'invoice_status' => $request->invoice_status ?? 'pending',
             'notes' => $request->notes,
             'client_id' => $request->client_id,
-            'shipment_id' => $request->shipment_id,
+            'shipment_id' => $request->shipment_ids[0] ?? null, // Usar el primer envío como referencia
             'user_id' => Auth::id(),
         ]);
 
-        // Marcar el envío como facturado
-        if ($request->shipment_id) {
-            Shipment::where('id', $request->shipment_id)->update(['invoiced' => true]);
+        // Crear relaciones en la tabla pivot y marcar como facturados
+        if ($request->shipment_ids && is_array($request->shipment_ids)) {
+            // Verificar que los shipments no estén ya facturados
+            $alreadyInvoicedShipments = \DB::table('invoice_shipments')
+                ->whereIn('shipment_id', $request->shipment_ids)
+                ->pluck('shipment_id')
+                ->toArray();
+            
+            if (!empty($alreadyInvoicedShipments)) {
+                return back()->withErrors([
+                    'shipment_ids' => 'Algunos paquetes ya han sido facturados: ' . implode(', ', $alreadyInvoicedShipments)
+                ])->withInput();
+            }
+            
+            // Crear relaciones en la tabla pivot
+            foreach ($request->shipment_ids as $shipmentId) {
+                try {
+                    \DB::table('invoice_shipments')->insert([
+                        'invoice_id' => $invoice->id,
+                        'shipment_id' => $shipmentId,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                } catch (\Illuminate\Database\QueryException $e) {
+                    // Si hay un error de duplicado, continuar con el siguiente
+                    if ($e->getCode() == 23000) { // Integrity constraint violation
+                        \Log::warning("Shipment {$shipmentId} already invoiced, skipping...");
+                        continue;
+                    }
+                    throw $e;
+                }
+            }
+            
+            // Marcar TODOS los envíos como facturados
+            Shipment::whereIn('id', $request->shipment_ids)->update(['invoiced' => true]);
         }
 
         return redirect()->route('invoices.show', $invoice)
@@ -88,7 +121,28 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice->load(['client', 'shipment', 'user']);
-        return view('invoices.show', compact('invoice'));
+        
+        // Cargar solo los envíos asociados a esta factura específica
+        $shipments = collect();
+        if ($invoice->shipment_id) {
+            // Buscar en la tabla pivot los envíos de esta factura
+            $shipmentIds = \DB::table('invoice_shipments')
+                ->where('invoice_id', $invoice->id)
+                ->pluck('shipment_id');
+                
+            if ($shipmentIds->count() > 0) {
+                $shipments = Shipment::whereIn('id', $shipmentIds)
+                    ->with(['box', 'recipient'])
+                    ->get();
+            } else {
+                // Fallback: usar el envío principal si no hay relaciones
+                $shipments = Shipment::where('id', $invoice->shipment_id)
+                    ->with(['box', 'recipient'])
+                    ->get();
+            }
+        }
+        
+        return view('invoices.show', compact('invoice', 'shipments'));
     }
 
     public function edit(Invoice $invoice)
@@ -198,7 +252,27 @@ class InvoiceController extends Controller
      */
     public function downloadPdf(Invoice $invoice)
     {
-        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
+        // Cargar los envíos asociados a esta factura (misma lógica que show)
+        $shipments = collect();
+        if ($invoice->shipment_id) {
+            // Buscar en la tabla pivot los envíos de esta factura
+            $shipmentIds = \DB::table('invoice_shipments')
+                ->where('invoice_id', $invoice->id)
+                ->pluck('shipment_id');
+                
+            if ($shipmentIds->count() > 0) {
+                $shipments = Shipment::whereIn('id', $shipmentIds)
+                    ->with(['box', 'recipient'])
+                    ->get();
+            } else {
+                // Fallback: usar el envío principal si no hay relaciones
+                $shipments = Shipment::where('id', $invoice->shipment_id)
+                    ->with(['box', 'recipient'])
+                    ->get();
+            }
+        }
+        
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'shipments'));
         
         $filename = 'Invoice_' . $invoice->invoice_number . '.pdf';
         

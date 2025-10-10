@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('packages_table_new', function (Blueprint $table) {
+        Schema::create('invoice_shipments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
+            $table->foreignId('shipment_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            
+            // Evitar duplicados
+            $table->unique(['invoice_id', 'shipment_id']);
         });
     }
 
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('packages_table_new');
+        Schema::dropIfExists('invoice_shipments');
     }
 };

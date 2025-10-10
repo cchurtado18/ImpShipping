@@ -81,6 +81,25 @@ Route::middleware(['auth'])->group(function () {
         return view('routes.clients', compact('route', 'eligibleClients'));
     })->name('routes.clients');
     
+    // Gastos de una ruta específica
+    Route::get('/routes/{route}/expenses', function (\App\Models\Route $route) {
+        $expenses = $route->routeExpenses()->orderBy('expense_date', 'desc')->paginate(15);
+        return view('routes.expenses', compact('route', 'expenses'));
+    })->name('routes.expenses');
+    
+    // Sistema de recepción de cajas
+    Route::get('/routes/{route}/reception', function (\App\Models\Route $route) {
+        return view('routes.reception', compact('route'));
+    })->name('routes.reception');
+    
+    // Reportes de una ruta específica
+    Route::get('/routes/{route}/reports', function (\App\Models\Route $route) {
+        $projections = $route->routeProjections()->orderBy('projection_date', 'desc')->paginate(15);
+        $expenses = $route->routeExpenses()->get();
+        $shipments = $route->shipments()->get();
+        return view('routes.reports', compact('route', 'projections', 'expenses', 'shipments'));
+    })->name('routes.reports');
+    
     // Gestión de facturas
     Route::resource('invoices', App\Http\Controllers\InvoiceController::class);
     Route::post('/invoices/{invoice}/mark-sent', [App\Http\Controllers\InvoiceController::class, 'markAsSent'])->name('invoices.mark-sent');
@@ -97,8 +116,15 @@ Route::middleware(['auth'])->group(function () {
     
     // Seguimientos de clientes
     Route::get('/followups', [FollowupController::class, 'index'])->name('followups.index');
+    Route::post('/followups/schedule', [FollowupController::class, 'scheduleFollowup'])->name('followups.schedule');
     Route::post('/followups/{client}/mark-done', [FollowupController::class, 'markDone'])->name('followups.mark-done');
     Route::post('/followups/{client}/postpone', [FollowupController::class, 'postpone'])->name('followups.postpone');
+    
+    // Route Leads
+    Route::get('/route-leads', [App\Http\Controllers\RouteLeadController::class, 'index'])->name('route-leads.index');
+    Route::post('/route-leads', [App\Http\Controllers\RouteLeadController::class, 'store'])->name('route-leads.store');
+    Route::post('/route-leads/{routeLead}/status', [App\Http\Controllers\RouteLeadController::class, 'updateStatus'])->name('route-leads.update-status');
+    Route::delete('/route-leads/{routeLead}', [App\Http\Controllers\RouteLeadController::class, 'destroy'])->name('route-leads.delete');
     
     // Envíos
     Route::get('/shipments', [App\Http\Controllers\ShipmentController::class, 'index'])->name('shipments.index');

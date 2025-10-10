@@ -10,11 +10,9 @@ use Livewire\Component;
 class AutoInvoiceForm extends Component
 {
     public $selectedClient = null;
-    public $selectedShipment = null;
+    public $selectedShipments = []; // Cambio: array para múltiples paquetes
     public $client = null;
-    public $shipment = null;
     public $clients = [];
-    public $shipments = [];
     public $availableShipments = [];
     public $invoice_status = 'pending';
     
@@ -73,6 +71,30 @@ class AutoInvoiceForm extends Component
         }
     }
 
+    public function toggleShipmentSelection($shipmentId)
+    {
+        if (in_array($shipmentId, $this->selectedShipments)) {
+            // Remover de la selección
+            $this->selectedShipments = array_filter($this->selectedShipments, function($id) use ($shipmentId) {
+                return $id != $shipmentId;
+            });
+            $this->selectedShipments = array_values($this->selectedShipments); // Reindexar array
+        } else {
+            // Agregar a la selección
+            $this->selectedShipments[] = $shipmentId;
+        }
+        
+        // Recargar datos según la selección actual
+        if (count($this->selectedShipments) > 0) {
+            $this->loadMultipleShipmentsData();
+        } else {
+            // Limpiar datos si no hay selección
+            $this->clearShipmentData();
+        }
+        
+        \Log::info('Selected shipments: ' . implode(',', $this->selectedShipments));
+    }
+
     public function loadClientData()
     {
         if ($this->client) {
@@ -99,31 +121,38 @@ class AutoInvoiceForm extends Component
                 ->first();
 
             if ($currentRoute) {
+                // Obtener IDs de shipments ya facturados
+                $invoicedShipmentIds = \DB::table('invoice_shipments')
+                    ->pluck('shipment_id')
+                    ->toArray();
+                
                 $this->availableShipments = Shipment::where('client_id', $this->selectedClient)
                     ->where('route_id', $currentRoute->id)
                     ->whereIn('shipment_status', ['por_recepcionar', 'recepcionado', 'dejado_almacen'])
                     ->where('invoiced', false) // Solo envíos no facturados
+                    ->whereNotIn('id', $invoicedShipmentIds) // Excluir shipments ya en facturas
                     ->with(['client', 'recipient', 'box'])
                     ->get();
             } else {
                 // Si no hay ruta actual, buscar envíos del cliente en cualquier ruta
+                $invoicedShipmentIds = \DB::table('invoice_shipments')
+                    ->pluck('shipment_id')
+                    ->toArray();
+                
                 $this->availableShipments = Shipment::where('client_id', $this->selectedClient)
                     ->whereIn('shipment_status', ['por_recepcionar', 'recepcionado', 'dejado_almacen'])
                     ->where('invoiced', false) // Solo envíos no facturados
+                    ->whereNotIn('id', $invoicedShipmentIds) // Excluir shipments ya en facturas
                     ->with(['client', 'recipient', 'box'])
                     ->get();
             }
             
-            // Si hay envíos disponibles, seleccionar automáticamente el primero
-            if ($this->availableShipments->count() > 0) {
-                $this->selectedShipment = $this->availableShipments->first()->id;
-                $this->shipment = Shipment::with(['client', 'recipient', 'box', 'route'])->find($this->selectedShipment);
-                $this->loadShipmentData();
-                \Log::info('Auto-selected shipment: ' . $this->selectedShipment);
-                \Log::info('Shipment data: ' . $this->shipment->code);
-            }
+            // NO auto-seleccionar envíos - permitir selección manual
+            $this->selectedShipments = [];
+            \Log::info('Available shipments loaded: ' . $this->availableShipments->count() . ' packages');
         } else {
             $this->availableShipments = [];
+            $this->selectedShipments = [];
         }
     }
 
@@ -186,6 +215,73 @@ class AutoInvoiceForm extends Component
         }
     }
 
+    public function loadMultipleShipmentsData()
+    {
+        if (count($this->selectedShipments) > 0) {
+            $shipments = Shipment::whereIn('id', $this->selectedShipments)
+                ->with(['client', 'recipient', 'box', 'route'])
+                ->get();
+
+            if ($shipments->count() > 0) {
+                // Usar el primer envío para datos del receptor (todos son del mismo cliente)
+                $firstShipment = $shipments->first();
+                
+                // Cargar datos del receptor
+                if ($firstShipment->recipient) {
+                    $this->recipient_name = $firstShipment->recipient->full_name;
+                    $this->recipient_phone = $firstShipment->recipient->ni_phone;
+                    $this->recipient_address = $firstShipment->recipient->ni_department . ', ' . 
+                                             $firstShipment->recipient->ni_city . ', ' . 
+                                             $firstShipment->recipient->ni_address;
+                }
+
+                // Crear descripción del servicio con múltiples paquetes
+                $serviceDescriptions = [];
+                $totalPrice = 0;
+                
+                foreach ($shipments as $shipment) {
+                    if ($shipment->box) {
+                        $box = $shipment->box;
+                        $volume = ($box->length_in * $box->width_in * $box->height_in) / 1728;
+                        $serviceDescriptions[] = "Envío " . $box->code . " - Dimensiones: " . 
+                                                $box->length_in . "\" × " . 
+                                                $box->width_in . "\" × " . 
+                                                $box->height_in . "\" (" . 
+                                                number_format($volume, 2) . " ft³)";
+                    }
+                    
+                    // Sumar precios
+                    $shipmentPrice = $shipment->sale_price_usd ?? 0;
+                    if ($shipmentPrice == 0 && $shipment->box) {
+                        $shipmentPrice = $shipment->box->base_price_usd ?? 0;
+                    }
+                    if ($shipment->transport_cost > 0) {
+                        $shipmentPrice += $shipment->transport_cost;
+                    }
+                    $totalPrice += $shipmentPrice;
+                }
+                
+                $this->service_description = implode('; ', $serviceDescriptions);
+                $this->unit_price = $totalPrice; // Precio total de todos los paquetes
+                $this->quantity = 1; // Cantidad = 1 (una factura con múltiples paquetes)
+
+                // Cargar notas combinadas
+                $notes = $shipments->pluck('notes')->filter()->unique()->implode('; ');
+                $this->notes = $notes;
+
+                // Establecer fecha de vencimiento (30 días)
+                $this->due_date = now()->addDays(30)->format('Y-m-d');
+                
+                \Log::info('Multiple shipments loaded: ' . count($shipments) . ' packages');
+                \Log::info('Total price: ' . $totalPrice);
+                \Log::info('Service Description: ' . $this->service_description);
+                
+                // Forzar actualización de la vista
+                $this->dispatch('$refresh');
+            }
+        }
+    }
+
     public function loadAvailableShipments()
     {
         // Cargar todos los envíos disponibles para selección manual
@@ -195,10 +291,23 @@ class AutoInvoiceForm extends Component
             ->get();
     }
 
+    public function clearShipmentData()
+    {
+        $this->recipient_name = '';
+        $this->recipient_phone = '';
+        $this->recipient_address = '';
+        $this->service_description = '';
+        $this->quantity = 1;
+        $this->unit_price = 0;
+        $this->tax_amount = 0;
+        $this->notes = '';
+    }
+
     public function clearForm()
     {
         $this->selectedClient = null;
         $this->selectedShipment = null;
+        $this->selectedShipments = [];
         $this->client = null;
         $this->shipment = null;
         $this->availableShipments = [];
