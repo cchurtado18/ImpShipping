@@ -210,7 +210,15 @@
                     <tr>
                         <td>
                             <div class="package-code">{{ $shipment->code }}</div>
-                            @if($shipment->box)
+                            @if($shipment->hasCustomDimensions())
+                            <div class="package-dimensions">
+                                Dimensiones: {{ $shipment->formatted_custom_dimensions }}
+                                @if($shipment->custom_weight > 0)
+                                    | Peso: {{ $shipment->custom_weight }} lbs
+                                @endif
+                                | Modo: {{ $shipment->price_mode_label }}
+                            </div>
+                            @elseif($shipment->box)
                             <div class="package-dimensions">
                                 Dimensiones: {{ $shipment->box->length_in }}" x {{ $shipment->box->width_in }}" x {{ $shipment->box->height_in }}"
                             </div>
@@ -226,7 +234,15 @@
                     <tr>
                         <td>
                             <div class="package-code">{{ $shipments->first()->code ?? 'N/A' }}</div>
-                            @if($shipments->first() && $shipments->first()->box)
+                            @if($shipments->first() && $shipments->first()->hasCustomDimensions())
+                            <div class="package-dimensions">
+                                Dimensiones: {{ $shipments->first()->formatted_custom_dimensions }}
+                                @if($shipments->first()->custom_weight > 0)
+                                    | Peso: {{ $shipments->first()->custom_weight }} lbs
+                                @endif
+                                | Modo: {{ $shipments->first()->price_mode_label }}
+                            </div>
+                            @elseif($shipments->first() && $shipments->first()->box)
                             <div class="package-dimensions">
                                 Dimensiones: {{ $shipments->first()->box->length_in }}" x {{ $shipments->first()->box->width_in }}" x {{ $shipments->first()->box->height_in }}"
                             </div>

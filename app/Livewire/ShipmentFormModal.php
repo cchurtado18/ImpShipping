@@ -80,6 +80,20 @@ class ShipmentFormModal extends Component
         $this->finalPrice = $shipment->sale_price_usd;
         $this->shipmentStatus = $shipment->shipment_status;
         $this->notes = $shipment->notes;
+        
+        // Cargar dimensiones personalizadas si existen
+        if ($shipment->hasCustomDimensions()) {
+            $this->customDimensions = true;
+            $this->boxLength = $shipment->custom_length ?? 0;
+            $this->boxWidth = $shipment->custom_width ?? 0;
+            $this->boxHeight = $shipment->custom_height ?? 0;
+            $this->boxWeight = $shipment->custom_weight ?? 0;
+            $this->boxWeightRate = $shipment->custom_weight_rate ?? 0;
+            $this->calculatedPrice = $shipment->calculated_price ?? 0;
+            $this->useCalculatedPrice = $shipment->use_calculated_price ?? true;
+            $this->manualPrice = $shipment->manual_price ?? 0;
+        }
+        
         $this->loadRecipients();
     }
     
@@ -261,17 +275,19 @@ class ShipmentFormModal extends Component
             'shipment_status' => $this->shipmentStatus,
         ];
         
-        // Si son dimensiones personalizadas, guardar en notes
+        // Si son dimensiones personalizadas, guardar en los nuevos campos
         if ($this->customDimensions) {
-            $dimensionsNote = "Custom Dimensions: {$this->boxLength}\" × {$this->boxWidth}\" × {$this->boxHeight}\"";
-            if ($this->boxWeight > 0 && $this->boxWeightRate > 0) {
-                $dimensionsNote .= " | Weight: {$this->boxWeight} lbs @ ${$this->boxWeightRate}/lb";
-            }
-            
-            $priceMode = $this->useCalculatedPrice ? "Calculated Price" : "Manual Price";
-            $dimensionsNote .= " | Calculated: ${$this->calculatedPrice} | {$priceMode}: ${$finalPriceToSave}";
-            
-            $shipmentData['notes'] = $this->notes ? $this->notes . "\n" . $dimensionsNote : $dimensionsNote;
+            $shipmentData = array_merge($shipmentData, [
+                'custom_length' => $this->boxLength,
+                'custom_width' => $this->boxWidth,
+                'custom_height' => $this->boxHeight,
+                'custom_weight' => $this->boxWeight,
+                'custom_weight_rate' => $this->boxWeightRate,
+                'calculated_price' => $this->calculatedPrice,
+                'use_calculated_price' => $this->useCalculatedPrice,
+                'manual_price' => $this->manualPrice,
+                'price_mode' => $this->useCalculatedPrice ? 'calculated' : 'manual',
+            ]);
         }
         
         if ($this->editingShipment) {
@@ -306,6 +322,7 @@ class ShipmentFormModal extends Component
         $this->shipmentStatus = 'por_recepcionar';
         $this->notes = '';
         $this->recipients = [];
+        // Reset dimensiones personalizadas
         $this->customDimensions = false;
         $this->boxLength = 0;
         $this->boxWidth = 0;

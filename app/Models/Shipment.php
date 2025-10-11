@@ -33,6 +33,16 @@ class Shipment extends Model
         'reception_notes',
         'received_by',
         'loaded_by',
+        // Dimensiones personalizadas
+        'custom_length',
+        'custom_width',
+        'custom_height',
+        'custom_weight',
+        'custom_weight_rate',
+        'calculated_price',
+        'use_calculated_price',
+        'manual_price',
+        'price_mode',
     ];
 
     protected $casts = [
@@ -41,6 +51,15 @@ class Shipment extends Model
         'invoiced' => 'boolean',
         'received_at' => 'datetime',
         'loaded_at' => 'datetime',
+        // Dimensiones personalizadas
+        'custom_length' => 'decimal:2',
+        'custom_width' => 'decimal:2',
+        'custom_height' => 'decimal:2',
+        'custom_weight' => 'decimal:2',
+        'custom_weight_rate' => 'decimal:2',
+        'calculated_price' => 'decimal:2',
+        'use_calculated_price' => 'boolean',
+        'manual_price' => 'decimal:2',
     ];
 
     protected static function boot()
@@ -221,5 +240,40 @@ class Shipment extends Model
             'cancelled' => '❌',
             default => '📦'
         };
+    }
+
+    // Métodos para dimensiones personalizadas
+    public function hasCustomDimensions(): bool
+    {
+        return !empty($this->custom_length) || !empty($this->custom_width) || !empty($this->custom_height);
+    }
+
+    public function getCustomCubicFeetAttribute(): float
+    {
+        if (!$this->hasCustomDimensions()) {
+            return 0;
+        }
+        
+        $cubicInches = ($this->custom_length ?? 0) * ($this->custom_width ?? 0) * ($this->custom_height ?? 0);
+        return round($cubicInches / 1728, 2);
+    }
+
+    public function getFormattedCustomDimensionsAttribute(): string
+    {
+        if (!$this->hasCustomDimensions()) {
+            return 'N/A';
+        }
+        
+        return "{$this->custom_length}\" × {$this->custom_width}\" × {$this->custom_height}\"";
+    }
+
+    public function getFinalPriceAttribute(): float
+    {
+        return $this->use_calculated_price ? ($this->calculated_price ?? 0) : ($this->manual_price ?? 0);
+    }
+
+    public function getPriceModeLabelAttribute(): string
+    {
+        return $this->use_calculated_price ? 'Calculado' : 'Manual';
     }
 }

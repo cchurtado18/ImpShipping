@@ -106,7 +106,13 @@
                                         <td class="border border-gray-300 px-4 py-3">
                                             <div class="font-medium">{{ $shipment->code }}</div>
                                             <div class="text-sm text-gray-600">
-                                                @if($shipment->box)
+                                                @if($shipment->hasCustomDimensions())
+                                                    Dimensiones: {{ $shipment->formatted_custom_dimensions }}
+                                                    @if($shipment->custom_weight > 0)
+                                                        | Peso: {{ $shipment->custom_weight }} lbs
+                                                    @endif
+                                                    | Modo: {{ $shipment->price_mode_label }}
+                                                @elseif($shipment->box)
                                                     Dimensiones: {{ $shipment->box->length_in }}" × {{ $shipment->box->width_in }}" × {{ $shipment->box->height_in }}"
                                                 @endif
                                             </div>
